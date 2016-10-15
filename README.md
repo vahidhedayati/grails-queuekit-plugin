@@ -35,7 +35,7 @@ compile ":queuekit:1.0"
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/grails2) | [demo](https://github.com/vahidhedayati/test-queuekit)
 
  
-## 2.(https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/conf/SampleConfig.groovy)[Configuration]
+## 2.[Configuration](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/conf/SampleConfig.groovy)
 The configuration provided would be added to Config.groovy on grails 2 and application.groovy in grails 3.
 
 
@@ -154,7 +154,7 @@ The process to convert your existing reports should be really kept to a minimal 
 
 ## Examples 
 
-#### Examples demonstrated on (https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/controllers/org/grails/plugin/queuekit/examples/ReportDemoController.groovy)[org.grails.plugin.queuekit.examples.ReportDemoController]
+#### Examples demonstrated on [org.grails.plugin.queuekit.examples.ReportDemoController](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/controllers/org/grails/plugin/queuekit/examples/ReportDemoController.groovy)
 ``
 
 Assuming you have:
@@ -222,7 +222,7 @@ def controllerCall() {
 }
 ```
 
-Then we create a service called (https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/services/org/grails/plugin/queuekit/examples/reports/ParamsExampleReportingService.groovy)[ParamsExampleReportingService]
+Then we create a service called [ParamsExampleReportingService](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/services/org/grails/plugin/queuekit/examples/reports/ParamsExampleReportingService.groovy)
 
 ```groovy
 package org.grails.plugin.queuekit.examples.reports
@@ -408,7 +408,7 @@ class XlsExampleReportingService extends QueuekitBaseReportsService {
 
 ### Beans that bind to other objects
 
-Take a look at (https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/src/main/groovy/org/grails/plugin/queuekit/examples/ComplexBindedBean.groovy)[org.grails.plugin.queuekit.examples.ComplexBindedBean] and read through it to understand how to bypass it
+Take a look at [org.grails.plugin.queuekit.examples.ComplexBindedBean](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/src/main/groovy/org/grails/plugin/queuekit/examples/ComplexBindedBean.groovy) and read through it to understand how to bypass it
 
 
 
@@ -422,14 +422,14 @@ This is a userService that exists within this plugin, you should override this a
 
 This is really as important as it gets, ensure you use proper class naming convention so no +_&*^!£$%^ characters no space etc just normal alphabet as if you were naming a domain class.
 Create a new service called
-> ##### ${name}ReportingService (https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/services/org/grails/plugin/queuekit/examples/reports/TsvExample1ReportingService.groovy)[TsvExample1ReportingService]
+> ##### ${name}ReportingService [TsvExample1ReportingService](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/services/org/grails/plugin/queuekit/examples/reports/TsvExample1ReportingService.groovy)
 
-This service must (https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/services/org/grails/plugin/queuekit/reports/QueuekitBaseReportsService.groovy)[extend QueuekitBaseReportsService].
+This service must [extend QueuekitBaseReportsService](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/services/org/grails/plugin/queuekit/reports/QueuekitBaseReportsService.groovy).
 
 
 Binding application security with the plugin
 =====
-Under the [grails 3 demo site] (https://github.com/vahidhedayati/test-queuekit3/), spring security got installed a new service called MyUserService which extends QueuekitUserService and overrides the default actions of the plugin to return userId if user is a super user and so forth.
+Under the [grails 3 demo site](https://github.com/vahidhedayati/test-queuekit3/), spring security got installed a new service called MyUserService which extends QueuekitUserService and overrides the default actions of the plugin to return userId if user is a super user and so forth.
 
 The service then takes over QueuekitUserService the test site's grails-app/init/test.queuekit3/Application.groovy
 ```groovy
