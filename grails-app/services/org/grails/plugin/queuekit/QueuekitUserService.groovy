@@ -1,8 +1,10 @@
 package org.grails.plugin.queuekit
 
 import grails.util.Holders
-import org.grails.plugins.web.taglib.ApplicationTagLib
+
 import java.text.SimpleDateFormat
+
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.plugin.queuekit.priority.Priority
 
 /**
@@ -102,33 +104,34 @@ class QueuekitUserService {
 	}
 
 	/**
-	 * !! ATTENTION !!
+	 * !! ATTENTION !! 
 	 * You are not required to override  :
 	 * reportPriority or checkReportPriority
-	 *
-	 * If you have not enabled standardRunnable or
+	 * 
+	 * If you have not enabled standardRunnable or 
 	 * set standardRunnable = false
 	 * then this aspect does not need to be touched.
-	 *
+	 * 
 	 * If you decide to use standardRunnable=true
-	 *
+	 * 
 	 * Then override this method in your local extended
-	 * version of this class.
-	 *
+	 * version of this class. 
+	 *  
 	 * This will be your last chance for this scenario to capture
 	 * and override the report status.
-	 *
+	 * 
 	 * This is an alternative method than using the provided default.
 	 * If you wish to configure reports in this manner centralised.
-	 *
-	 * You will still need to declare
-	 * Priority getQueuePriority in your extends reportService.
-	 *
-	 * But take a look at ParamsExampleReportingService since
+	 * 
+	 * You will still need to declare 
+	 * Priority getQueuePriority in your extends reportService. 
+	 * 
+	 * But take a look at ParamsExampleReportingService since 
 	 * you can keep it plain
-	 *
+	 * 
 	 * -------------------------------------------------------------
 	 * How it works
+	 * 
 	 * Whilst you can configure a report to have LOW priority
 	 * It could be that it needs to be LOW for long term date range
 	 * but HIGH for a short 1 day lookup
@@ -166,6 +169,7 @@ class QueuekitUserService {
 	}
 
 	/*
+	 * refer to above 
 	 * A demo of how to try to override a report's priority
 	 * in this case based on from/to Dates 
 	 * 

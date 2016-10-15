@@ -1,12 +1,9 @@
-package queuekit
-
-import grails.plugins.Plugin
 import org.grails.plugin.queuekit.ArrayBlockingExecutor
 import org.grails.plugin.queuekit.LinkedBlockingExecutor
 import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
 
-class QueuekitGrailsPlugin extends Plugin {
+class QueuekitGrailsPlugin {
 	def version = "1.0"
 	def grailsVersion = "2.4 > *"
 	def title = "queuekit plugin"
@@ -22,13 +19,10 @@ class QueuekitGrailsPlugin extends Plugin {
 	def developers = [name: 'Vahid Hedayati', email: 'badvad@gmail.com']
 	def issueManagement = [system: 'GITHUB', url: 'https://github.com/vahidhedayati/grails-queuekit-plugin/issues']
 	def scm = [url: 'https://github.com/vahidhedayati/grails-queuekit-plugin']
-	Closure doWithSpring() {
-		{->
-			arrayBlockingExecutor(ArrayBlockingExecutor)
-			linkedBlockingExecutor(LinkedBlockingExecutor)
-			priorityBlockingExecutor(PriorityBlockingExecutor)
-			enhancedPriorityBlockingExecutor(EnhancedPriorityBlockingExecutor)
-			priorityBlockingExecutor(PriorityBlockingExecutor)
-		}
+	def doWithSpring = {
+		arrayBlockingExecutor(ArrayBlockingExecutor)
+		linkedBlockingExecutor(LinkedBlockingExecutor)
+		priorityBlockingExecutor(PriorityBlockingExecutor)
+		enhancedPriorityBlockingExecutor(EnhancedPriorityBlockingExecutor)
 	}
 }

@@ -1,9 +1,13 @@
 package org.grails.plugin.queuekit.executors
 
-import grails.core.GrailsApplication
-import grails.core.support.GrailsApplicationAware
 import grails.util.Holders
+
 import org.grails.plugin.queuekit.ReportsQueue
+import org.grails.plugin.queuekit.event.ArrayBlockingQueuedEvent
+import org.grails.plugin.queuekit.event.EnhancedPriorityBlockingQueuedEvent
+import org.grails.plugin.queuekit.event.LinkedBlockingQueuedEvent
+import org.grails.plugin.queuekit.event.PriorityBlockingQueuedEvent
+
 
 /**
  * QueuekitExecutorBaseService is the main class that holds global actions used by
@@ -36,10 +40,9 @@ import org.grails.plugin.queuekit.ReportsQueue
  * @author Vahid Hedayati
  *
  */
-class QueuekitExecutorBaseService implements GrailsApplicationAware {
+class QueuekitExecutorBaseService {
 
-	def config
-	GrailsApplication grailsApplication
+	def grailsApplication
 
 	void checkQueue(Long id=null) {
 		def inputParams=[:]
@@ -81,24 +84,23 @@ class QueuekitExecutorBaseService implements GrailsApplicationAware {
 		log.info "waiting reports ${waiting.size()}"
 		waiting?.each{queue ->
 
-			//new Thread({
-			//	sleep(500)
-				switch (queue?.queueType) {
+			new Thread({
+				sleep(500)
+				switch (queue.queueType) {
 					case ReportsQueue.LINKEDBLOCKING:
-						notify( "method.linkedBlocking",queue.id)
+						publishEvent(new LinkedBlockingQueuedEvent(queue.id))
 						break
 					case ReportsQueue.ARRAYBLOCKING:
-						notify( "method.arrayBlocking",queue.id)
+						publishEvent(new ArrayBlockingQueuedEvent(queue.id))
 						break
 					case ReportsQueue.PRIORITYBLOCKING:
-						notify( "method.priorityBlocking",queue.id)
+						publishEvent(new PriorityBlockingQueuedEvent(queue.id))
 						break
 					case ReportsQueue.ENHANCEDPRIORITYBLOCKING:
-						notify( "method.enhancedPriorityBlocking",queue.id)
+						publishEvent(new EnhancedPriorityBlockingQueuedEvent(queue.id))
 						break
 				}
-
-			//} as Runnable ).start()
+			} as Runnable ).start()
 		}
 	}
 
@@ -173,7 +175,7 @@ class QueuekitExecutorBaseService implements GrailsApplicationAware {
 		}
 	}
 
-	void setGrailsApplication(GrailsApplication ga) {
-		config = ga.config.queuekit
+	ConfigObject getConfig() {
+		return grailsApplication.config?.queuekit ?: ''
 	}
 }

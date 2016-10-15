@@ -5,8 +5,8 @@ import grails.validation.Validateable
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.priority.Priority
 
-
-class ChangePriorityBean implements Validateable {
+@Validateable
+class ChangePriorityBean {
 
 	Priority priority
 	ReportsQueue queue

@@ -1,10 +1,9 @@
 package org.grails.plugin.queuekit.examples
 
-import org.grails.plugin.queuekit.ReportsQueue
-
 import java.rmi.server.UID
 import java.security.SecureRandom
 
+import org.grails.plugin.queuekit.ReportsQueue
 /**
  * Demonstration class used to show how plugin works 
  * @author Vahid Hedayati
@@ -15,8 +14,9 @@ class TsvService {
 	static prng = new SecureRandom()
 	Random random = new Random()
 
+
 	def runNoReport(Report2Bean bean) {
-			return []
+		return []
 	}
 
 	def runParams(params) {
@@ -40,7 +40,7 @@ class TsvService {
 	 * and CsvExampleReporingService in this plugin
 	 * In both cases report output will be much slower
 	 * to show priorities working
-	 *
+	 * 
 	 */
 	def runReport3(Report3Bean bean) {
 		return getResults(true)
@@ -52,7 +52,7 @@ class TsvService {
 	 *  a list containing all your elements.
 	 *  For this test a simple list containing fields: id, text.
 	 *  Slowed down in XLS cases to show priorityExecutor work
-	 *
+	 *   
 	 */
 
 	private List getResults(boolean doSleep=false) {
@@ -76,21 +76,21 @@ class TsvService {
 	def runReport4(Report2Bean bean) {
 
 		String query="""select new map(rq.id as id, rq.retries as retries, rq.paramsMap as paramsMap,
-		coalesce(rq.displayName,rq.reportName) as reportName,
+		coalesce(rq.displayName,rq.reportName) as reportName, 
 		rq.userId as userId,
 		rq.reportName as realReport,
-			(case
+			(case 
 				when rq.class=ReportsQueue then '${ReportsQueue.ENHANCEDPRIORITYBLOCKING}'
 				when rq.class=EnhancedPriorityBlockingReportsQueue then '${ReportsQueue.ENHANCEDPRIORITYBLOCKING}'
 				when rq.class=PriorityBlockingReportsQueue then '${ReportsQueue.PRIORITYBLOCKING}'
 				when rq.class=LinkedBlockingReportsQueue then '${ReportsQueue.LINKEDBLOCKING}'
 				when rq.class=ArrayBlockingReportsQueue then '${ReportsQueue.ARRAYBLOCKING}'
 			end) as queueType,
-			(case
+			(case 
 				when rq.class=PriorityBlockingReportsQueue then rq.priority
-				when rq.class=EnhancedPriorityBlockingReportsQueue then rq.priority
+				when rq.class=EnhancedPriorityBlockingReportsQueue then rq.priority					
 			end) as priority,
-		rq.fileName as fileName, rq.start as startDate, rq.created as created,
+		rq.fileName as fileName, rq.start as startDate, rq.created as created, 
 		rq.finished as finishDate, rq.status as status
 	)
 	from ReportsQueue rq

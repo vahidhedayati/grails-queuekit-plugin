@@ -1,14 +1,14 @@
 package org.grails.plugin.queuekit.executors
 
+import java.util.concurrent.RunnableFuture
+
 import org.grails.plugin.queuekit.ComparableRunnable
 import org.grails.plugin.queuekit.EnhancedPriorityBlockingReportsQueue
 import org.grails.plugin.queuekit.ReportRunnable
 import org.grails.plugin.queuekit.ReportsQueue
+import org.grails.plugin.queuekit.event.EnhancedPriorityBlockingQueuedEvent
 import org.grails.plugin.queuekit.priority.Priority
-import reactor.spring.context.annotation.Consumer
-import reactor.spring.context.annotation.Selector
-
-import java.util.concurrent.RunnableFuture
+import org.springframework.context.ApplicationListener
 
 /**
  * Priority Blocking uses priorityBlockingExecutor to manage report queue.
@@ -17,61 +17,60 @@ import java.util.concurrent.RunnableFuture
  * 
  * 
  */
-@Consumer
-class EnhancedPriorityBlockingReportsQueueService extends QueuekitExecutorBaseService  {
+class EnhancedPriorityBlockingReportsQueueService extends QueuekitExecutorBaseService  implements ApplicationListener<EnhancedPriorityBlockingQueuedEvent> {
 
 	def enhancedPriorityBlockingExecutor
 
-	@Selector('method.enhancedPriorityBlocking')
-	void linkedBlocking(Long eventId) {
-		log.info "Received ${eventId}"
+
+	void onApplicationEvent(EnhancedPriorityBlockingQueuedEvent event) {
+		log.info "Received ${event.source}"
 		/*
 		 * We are working with EnhancedPriorityBlockingQueuedEvent which is a direct relation to
 		 *  EnhancedPriorityBlockingReportsQueue domainClass
 		 *  in EnhancedPriorityBlockingReportsQueue we have additional fields 
 		 *  lets load up correct queue domainClass
 		 */
-		EnhancedPriorityBlockingReportsQueue.withTransaction {
-			EnhancedPriorityBlockingReportsQueue queue = EnhancedPriorityBlockingReportsQueue.read(eventId)
-			if (queue && (queue.status == ReportsQueue.QUEUED || queue.status == ReportsQueue.ERROR)) {
 
-				def useEmergencyExecutor = config.useEmergencyExecutor == true
-				def manualDownloadEnabled = config.manualDownloadEnabled == true
+		EnhancedPriorityBlockingReportsQueue queue=EnhancedPriorityBlockingReportsQueue.read(event.source)
+		if (queue && (queue.status==ReportsQueue.QUEUED||queue.status==ReportsQueue.ERROR)) {
 
-				if ((enhancedPriorityBlockingExecutor.isShutdown() || enhancedPriorityBlockingExecutor.isTerminated()) &&
-						(!useEmergencyExecutor || (useEmergencyExecutor &&
-								(enhancedPriorityBlockingExecutor.alternateExecutor.isShutdown() || enhancedPriorityBlockingExecutor.alternateExecutor.isTerminated()))
-								&& manualDownloadEnabled)) {
-					log.error "enhancedPriorityBlockingExecutor and alternative executor not responding triggering manual download"
-					setManualStatus(queue.id)
-					executeManualReport(queue)
+			def useEmergencyExecutor = config.useEmergencyExecutor == true
+			def manualDownloadEnabled = config.manualDownloadEnabled == true
 
-					return
-				}
+			if ((enhancedPriorityBlockingExecutor.isShutdown() || enhancedPriorityBlockingExecutor.isTerminated()) &&
+			(!useEmergencyExecutor || (useEmergencyExecutor &&
+			(enhancedPriorityBlockingExecutor.alternateExecutor.isShutdown() || enhancedPriorityBlockingExecutor.alternateExecutor.isTerminated()))
+			&& manualDownloadEnabled)){
+				log.error "enhancedPriorityBlockingExecutor and alternative executor not responding triggering manual download"
+				setManualStatus(queue.id)
+				executeManualReport(queue)
 
-				Priority priority = queue.priority ?: queue.defaultPriority
-
-				def currentTask
-				RunnableFuture task
-				if (config.standardRunnable) {
-					currentTask = new ReportRunnable(queue)
-					/*
-                     * This now calls the overridden execute method in PriorityBlockingExecutor
-                     * which converts RunnableFuture (FutureTask) to ComparableFutureTask
-                     * This then captures queueId for usage in cancellation
-                     *
-                     * This uses advanced features of ComparableFutureTask since priority value is provided
-                     * and a different block is called in PriorityBlockingExecutor
-                     */
-					task = enhancedPriorityBlockingExecutor.execute(currentTask,priority.value)
-				} else {
-					currentTask = new ComparableRunnable(queue)
-					task = enhancedPriorityBlockingExecutor.execute(currentTask)
-				}
-
-				task?.get()
+				return
 			}
+
+			Priority priority = queue.priority ?: queue.defaultPriority
+
+			def currentTask
+			RunnableFuture task
+			if (config.standardRunnable) {
+				currentTask = new ReportRunnable(queue)
+				/*
+				 * This now calls the overridden execute method in PriorityBlockingExecutor
+				 * which converts RunnableFuture (FutureTask) to ComparableFutureTask
+				 * This then captures queueId for usage in cancellation
+				 *
+				 * This uses advanced features of ComparableFutureTask since priority value is provided
+				 * and a different block is called in PriorityBlockingExecutor
+				 */
+				task = enhancedPriorityBlockingExecutor.execute(currentTask,priority.value)
+			} else {
+				currentTask = new ComparableRunnable(queue)
+				task = enhancedPriorityBlockingExecutor.execute(currentTask)
+			}
+
+			task?.get()
 		}
+
 	}
 
 }

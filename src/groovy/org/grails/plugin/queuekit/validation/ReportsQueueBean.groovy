@@ -7,8 +7,14 @@ import grails.validation.Validateable
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.priority.Priority
 
-
-class ReportsQueueBean implements Validateable {
+/**
+ * This controls report listing
+ * 
+ * @author Vahid Hedayati
+ *
+ */
+@Validateable
+class ReportsQueueBean  {
 
 	def queuekitUserService = Holders.grailsApplication.mainContext.getBean('queuekitUserService')
 	def grailsLinkGenerator = Holders.grailsApplication.mainContext.getBean('grailsLinkGenerator')

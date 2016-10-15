@@ -1,30 +1,15 @@
-# Grails
-logs/
-# Gradle
-build/
-.gradle/
-.gradletasknamecache
-# Eclipse
-.project
-.metadata
-bin/**
-.classpath
-.settings/
-# IDEA
-*.iml
-*.ipr
-*.iws
-.idea/
-# target
-target/
-/*.log
-/*.sha1
-/*.zip
+/web-app/WEB-INF
 /.classpath
 /.project
 /.settings
-stacktrace.log
-/.gradle
+*.log
+/*.zip
+plugin.xml
+/target
+/target-eclipse
+*.iws
 /.idea
-/.link_to_grails_plugins
-/build
+*.iml
+*.iws
+.DS_Store
+/log

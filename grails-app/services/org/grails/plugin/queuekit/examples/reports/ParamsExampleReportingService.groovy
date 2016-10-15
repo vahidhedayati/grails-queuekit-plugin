@@ -1,5 +1,7 @@
 package org.grails.plugin.queuekit.examples.reports
 
+import java.util.Map;
+
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.priority.Priority;
 import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService

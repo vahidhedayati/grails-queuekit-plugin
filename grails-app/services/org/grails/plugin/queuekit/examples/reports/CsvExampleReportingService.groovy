@@ -1,6 +1,6 @@
 package org.grails.plugin.queuekit.examples.reports
 
-import grails.web.databinding.DataBindingUtils
+import org.codehaus.groovy.grails.web.binding.DataBindingUtils
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.examples.Report3Bean
 import org.grails.plugin.queuekit.priority.Priority

@@ -33,6 +33,7 @@ class QueueKitController {
 	def queueReportService
 	def arrayBlockingReportsQueueService
 	def queuekitUserService
+	def enhancedPriorityBlockingExecutor
 
 	/**
 	 * Display a given report Queue record
@@ -236,5 +237,5 @@ class QueueKitController {
 		}
 		response.status=response.SC_CONFLICT
 	}
-
+	
 }

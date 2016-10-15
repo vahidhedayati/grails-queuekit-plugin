@@ -149,12 +149,12 @@ class QueuekitHelper {
 	 * 
 	 *
 	 * @param runningJobs  (Pass in runningJobs of given Executor Choice of PriorityExecutor or EhancedPriorityExecutors)
-	 * @param runningQueue (The getQueue() element of any of the above executors)
+	 * @param waitingQueue (The getQueue() element of any of the above executors)
 	 * @param optional definedPriority  (provide configuration definedPriority or not)
 	 * @param optional userId (provide a userId or not)
 	 * @return
 	 */
-	public static Map executorCount(Collections.SynchronizedSet runningJobs,PriorityBlockingQueue runningQueue,
+	public static Map executorCount(Collections.SynchronizedSet runningJobs,PriorityBlockingQueue waitingQueue,
 			int definedPriority=EnhancedPriorityBlockingExecutor.definedPriority.value, Long userId=0) {
 
 		def runBelowPriority = runningJobs?.findAll{it.priority < definedPriority}
@@ -163,10 +163,10 @@ class QueuekitHelper {
 		def runAbovePriority =runningJobs?.findAll{it.priority >= definedPriority}
 		int runningAbovePriority=runAbovePriority?.size() ?:  0
 
-		def queueAbovePriority=runningQueue?.findAll{k-> if (k?.priority) {k.priority?.value >= definedPriority}}
+		def queueAbovePriority=waitingQueue?.findAll{k-> if (k?.priority) {k.priority?.value >= definedPriority}}
 		int queuedAbovePriority = queueAbovePriority?.size() ?: 0
 
-		def queueBelowPriority=runningQueue?.findAll{k-> if (k?.priority) {k.priority?.value < definedPriority}}
+		def queueBelowPriority=waitingQueue?.findAll{k-> if (k?.priority) {k.priority?.value < definedPriority}}
 		int queuedBelowPriority = queueBelowPriority?.size() ?: 0
 
 		int userQueuedAbove,userQueuedBelow,userRunningAbove,userRunningBelow,othersWaitingAbove,othersWaitingBelow

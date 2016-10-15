@@ -4,8 +4,8 @@ import grails.validation.Validateable
 
 // This is your validation bean for user selecting a report front end
 // not really provided here but results are returned as a map to frontend caller 
-
-class Report1Bean  implements Validateable {
+@Validateable
+class Report1Bean {
 	// this is the front end params captured
 	// this would be what they have selected
 	String report='report1'

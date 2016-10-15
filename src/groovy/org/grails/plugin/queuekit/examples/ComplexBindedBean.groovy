@@ -1,8 +1,17 @@
 package org.grails.plugin.queuekit.examples
 
+import grails.util.Holders
 import grails.validation.Validateable
 
-class ComplexBindedBean implements Validateable {
+import java.text.SimpleDateFormat
+
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+import org.grails.plugin.queuekit.ReportsQueue
+import org.grails.plugin.queuekit.priority.Priority
+
+
+@Validateable
+class ComplexBindedBean {
 	 
 	Long userId
 	String report='ComplexBinding'

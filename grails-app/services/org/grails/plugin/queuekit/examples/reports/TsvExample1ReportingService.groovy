@@ -1,9 +1,11 @@
 package org.grails.plugin.queuekit.examples.reports
 
-import grails.web.databinding.DataBindingUtils
+import java.util.Map;
+
+import org.codehaus.groovy.grails.web.binding.DataBindingUtils
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.examples.Report1Bean
-import org.grails.plugin.queuekit.priority.Priority
+import org.grails.plugin.queuekit.priority.Priority;
 import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 
 
@@ -32,7 +34,7 @@ class TsvExample1ReportingService extends QueuekitBaseReportsService {
 		}
 		return priority
 	}
-
+	
 	def runReport(ReportsQueue queue,Map params) {
 		/*
 		 * This is the service bound to index action of Report1Controller

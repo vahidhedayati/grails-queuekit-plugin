@@ -5,8 +5,8 @@ import grails.validation.Validateable
 
 import org.grails.plugin.queuekit.ReportsQueue
 
-
-class QueueKitBean implements Validateable {
+@Validateable
+class QueueKitBean {
 
 	def queuekitUserService = Holders.grailsApplication.mainContext.getBean('queuekitUserService')
 
@@ -22,7 +22,7 @@ class QueueKitBean implements Validateable {
 	String searchBy
 	String searchFor
 	Long userSearchId
-
+	
 	String status
 
 	Integer max=Math.min(10, 50)
@@ -41,7 +41,7 @@ class QueueKitBean implements Validateable {
 		status (inList:ReportsQueue.REPORT_STATUS_ALL)
 		userSearchId(nullable:true)
 		searchFor(nullable:true)
-		searchBy(inList:SEARCH_TYPES)
+		searchBy(inList:SEARCH_TYPES)		
 		deleteBy(nullable:true, inList:deleteList)
 	}
 
@@ -71,7 +71,7 @@ class QueueKitBean implements Validateable {
 	List getStatuses() {
 		return (getSuperUser() ? ReportsQueue.REPORT_STATUS_ALL : ReportsQueue.REPORT_STATUS)
 	}
-	
+
 	List getAdminButtons() {
 		return (getSuperUser() ? ChangeConfigBean.CHANGE_TYPES : [])
 	}
@@ -95,7 +95,7 @@ class QueueKitBean implements Validateable {
 		}
 		return null
 	}
-	
+
 	/**
 	 * Search map used by search page
 	 * @return
@@ -107,7 +107,7 @@ class QueueKitBean implements Validateable {
 			userSearchId:userSearchId,
 			status:status,
 			sort:sort,
-			offset:offset,
+			offset:offset,			
 			position:position,
 			order:order,
 			jobControl:jobControl,
@@ -115,7 +115,7 @@ class QueueKitBean implements Validateable {
 		]
 		return search
 	}
-	
+
 	/**
 	 * form order
 	 * @param o

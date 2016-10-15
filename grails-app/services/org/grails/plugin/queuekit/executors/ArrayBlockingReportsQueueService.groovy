@@ -1,15 +1,18 @@
 package org.grails.plugin.queuekit.executors
 
 import groovy.time.TimeCategory
-import org.grails.plugin.queuekit.ArrayBlockingReportsQueue
-import org.grails.plugin.queuekit.ReportRunnable
-import org.grails.plugin.queuekit.ReportsQueue
-import org.grails.plugin.queuekit.validation.QueueKitBean
-import reactor.spring.context.annotation.Consumer
-import reactor.spring.context.annotation.Selector
 
 import java.util.concurrent.RunnableFuture
 import java.util.concurrent.TimeUnit
+
+import org.grails.plugin.queuekit.ArrayBlockingReportsQueue
+import org.grails.plugin.queuekit.ReportRunnable
+import org.grails.plugin.queuekit.ReportsQueue
+import org.grails.plugin.queuekit.event.ArrayBlockingQueuedEvent
+import org.grails.plugin.queuekit.event.PriorityBlockingQueuedEvent
+import org.grails.plugin.queuekit.validation.QueueKitBean
+import org.springframework.context.ApplicationListener
+
 
 /**
  * ArrayBlockingReportsQueueService extends the default functionality 
@@ -25,14 +28,14 @@ import java.util.concurrent.TimeUnit
  * @author Vahid Hedayati
  *
  */
-@Consumer
-class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 
+class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  implements ApplicationListener<ArrayBlockingQueuedEvent> {
+
+	def grailsApplication
 	def arrayBlockingExecutor
 
-	@Selector('method.arrayBlocking')
-	void arrayBlocking(Long eventId) {
-		log.info "Received ${eventId}"
+	void onApplicationEvent(ArrayBlockingQueuedEvent event) {
+		log.info "Received ${event.source}"
 
 		/*
 		 * We are working with ArrayBlockingQueuedEvent which is a direct relation to
@@ -40,37 +43,36 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 		 *
 		 *  lets load up correct queue domainClass
 		 */
-		ArrayBlockingReportsQueue.withTransaction {
-			ArrayBlockingReportsQueue queue = ArrayBlockingReportsQueue.read(eventId)
-			if (queue && (queue.status == ReportsQueue.QUEUED || queue.status == ReportsQueue.ERROR)) {
-				def result
-				/*
+
+		ArrayBlockingReportsQueue queue=ArrayBlockingReportsQueue.read(event.source)
+		if (queue && (queue.status==ReportsQueue.QUEUED || queue.status==ReportsQueue.ERROR)) {
+			def result
+			/*
 			 * ArrayBlockingQueue does not automatically process queue. 
 			 * When more requests than available slots are sent it will hit this try - 
 			 * Catch exception when thread pool is exhausted then reset Queue Date 
 			 * so when next task completes it calls checkQueue which then attempts to schedule 
 			 */
-				try {
-					ReportRunnable currentTask = new ReportRunnable(queue)
-					/*
+			try {
+				ReportRunnable currentTask = new ReportRunnable(queue)
+				/*
 				 * This now calls the overridden execute method in ArrayBlockingExecutor
 				 * which converts RunnableFuture (FutureTask) to ComparableFutureTask
 				 * This then captures queueId for usage in cancellation
 				 */
-					RunnableFuture task = arrayBlockingExecutor.execute(currentTask, queue.id)
-					try {
-						result = task?.get(reportTimeout, TimeUnit.SECONDS)
-					} catch (e) {
-						task.cancel(true)
-						log.error "Report ${queue.reportName} ${queue.id} has timed out. Report being set to error status"
-					}
+				RunnableFuture task = arrayBlockingExecutor.execute(currentTask,queue.id)
+				try {
+					result=task?.get(reportTimeout,TimeUnit.SECONDS)
 				} catch (e) {
-					/*
+					task.cancel(true)
+					log.error "Report ${queue.reportName} ${queue.id} has timed out. Report being set to error status"
+				}
+			} catch (e) {
+				/*
 				 * Task java.util.concurrent exception is thrown when all threads are used up and a report is forced to queue
 				 * ignore the exception and add id back in pool. checkQueue should pick up all queued reports
-				 */
-					resetRequeueDate(queue.id)
-				}
+				 */ 
+				resetRequeueDate(queue.id)
 			}
 		}
 	}
@@ -123,10 +125,10 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 		waiting?.each{queue ->
 			if (running < threadLimit) {
 				setRequeueDate(queue.id)
-				//new Thread({
-					//sleep(500)
-				notify( "method.arrayBlocking",queue.id)
-				//} as Runnable ).start()
+				new Thread({
+					sleep(500)
+					publishEvent(new PriorityBlockingQueuedEvent(queue.id))
+				} as Runnable ).start()
 				running++
 			}
 
@@ -197,7 +199,7 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 			// To enable queueing to be handled by Threading remove if statement below
 			if (running < threadLimit ) {
 				setRequeueDate(queueId)
-				notify( "method.arrayBlocking",queue.id)
+				new Thread({publishEvent(new ArrayBlockingQueuedEvent(queueId))} as Runnable ).start()
 				result=true
 			}
 		}
@@ -230,7 +232,7 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 				if (running < threadLimit ) {
 					startedJob=true
 					setRequeueDate(queue.id)
-					notify( "method.arrayBlocking",queue.id)
+					new Thread({publishEvent(new ArrayBlockingQueuedEvent(queue.id))} as Runnable ).start()
 					running++
 				}
 			}

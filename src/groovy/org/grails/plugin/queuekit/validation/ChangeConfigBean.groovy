@@ -17,8 +17,8 @@ import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
  * @author Vahid Hedayati
  *
  */
-
-class ChangeConfigBean extends ChangePriorityBean implements Validateable {
+@Validateable
+class ChangeConfigBean extends ChangePriorityBean {
 
 	static final String POOL='PO'
 	static final String PRESERVE='PR'
@@ -30,6 +30,7 @@ class ChangeConfigBean extends ChangePriorityBean implements Validateable {
 	static final String DEFAULTCOMPARATOR='DC'
 	static final String MAXQUEUE='MQ'
 	static final List CHANGE_TYPES=[POOL,MAXQUEUE,PRESERVE,DEFAULTCOMPARATOR,FLOODCONTROL,LIMITUSERABOVE,LIMITUSERBELOW,CHECKQUEUE,STOPEXECUTOR]
+
 
 	int changeValue
 	String changeType
@@ -63,10 +64,10 @@ class ChangeConfigBean extends ChangePriorityBean implements Validateable {
 			case STOPEXECUTOR:
 				ReportsQueue.REPORT_TYPES-[ReportsQueue.ARRAYBLOCKING]
 				break
-			case POOL:
+			case MAXQUEUE:
 				ReportsQueue.REPORT_TYPES
 				break
-			case MAXQUEUE:
+			case POOL:
 				ReportsQueue.REPORT_TYPES
 				break
 			case CHECKQUEUE:
@@ -110,13 +111,13 @@ class ChangeConfigBean extends ChangePriorityBean implements Validateable {
 			case ReportsQueue.LINKEDBLOCKING:
 				results=formatAdvanced(changeType,results,LinkedBlockingExecutor)
 				break
-			case ReportsQueue.ARRAYBLOCKING:
-				results=formatAdvanced(changeType,results,ArrayBlockingExecutor)
+			case ReportsQueue.ARRAYBLOCKING:				
+				results=formatAdvanced(changeType,results,ArrayBlockingExecutor)				
 				break
-			case ReportsQueue.PRIORITYBLOCKING:
+			case ReportsQueue.PRIORITYBLOCKING:				
 				results=formatAdvanced(changeType,results,PriorityBlockingExecutor)
 				break
-			case ReportsQueue.ENHANCEDPRIORITYBLOCKING:
+			case ReportsQueue.ENHANCEDPRIORITYBLOCKING:				
 				results=formatAdvanced(changeType,results,EnhancedPriorityBlockingExecutor)
 				break
 		}
@@ -150,9 +151,10 @@ class ChangeConfigBean extends ChangePriorityBean implements Validateable {
 		return results
 	}
 
-	static def checkValue= { val, obj, errors ->
-		if (val && val < 0 && obj.changeType != CHECKQUEUE) {
+	static def checkValue= {val, obj, errors ->
+		if (val && val<0 && obj.changeType != CHECKQUEUE) {
 			errors.rejectValue(propertyName, "queuekit.invalidConfigValue.error")
 		}
 	}
+
 }

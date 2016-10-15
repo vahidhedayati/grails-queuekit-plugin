@@ -2,15 +2,17 @@ package org.grails.plugin.queuekit.examples
 
 import grails.util.Holders
 import grails.validation.Validateable
+
 import java.text.SimpleDateFormat
-import org.grails.plugins.web.taglib.ApplicationTagLib
+
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.priority.Priority
 
 // This is your validation bean for user selecting a report front end
 // not really provided here but results are returned as a map to frontend caller
-
-class Report3Bean   implements Validateable {
+@Validateable
+class Report3Bean {
 	 
 	def g = Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
 	

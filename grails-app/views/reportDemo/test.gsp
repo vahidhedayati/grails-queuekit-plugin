@@ -4,7 +4,9 @@
 	<head>
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'example.label', default: 'example')}" />
-		<title><g:message code="queuekit.menu.label" args="[entityName]" default="Welcome to ${entityName}" /></title>
+		<title><g:message code="default.admin.menu.label" args="[entityName]" default="Welcome to ${entityName}" /></title>
+		<asset:javascript src="bootstrap.js" />
+		<asset:stylesheet href="bootstrap.css" />
 		<style type="text/css">
 		html,body {
 			max-width: 100% !important;

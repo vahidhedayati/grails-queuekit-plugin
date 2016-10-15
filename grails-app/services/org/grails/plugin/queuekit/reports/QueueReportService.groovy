@@ -2,12 +2,25 @@
 
 package org.grails.plugin.queuekit.reports
 
-import grails.converters.JSON
-import grails.core.GrailsApplication
-import grails.core.support.GrailsApplicationAware
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import org.grails.plugin.queuekit.*
+
+import java.util.concurrent.RunnableFuture
+
+import org.grails.plugin.queuekit.ArrayBlockingExecutor
+import org.grails.plugin.queuekit.ArrayBlockingReportsQueue
+import org.grails.plugin.queuekit.ComparableRunnable
+import org.grails.plugin.queuekit.EnhancedPriorityBlockingReportsQueue
+import org.grails.plugin.queuekit.LinkedBlockingExecutor
+import org.grails.plugin.queuekit.LinkedBlockingReportsQueue
+import org.grails.plugin.queuekit.PriorityBlockingReportsQueue
+import org.grails.plugin.queuekit.QueuekitHelper
+import org.grails.plugin.queuekit.ReportRunnable
+import org.grails.plugin.queuekit.ReportsQueue
+import org.grails.plugin.queuekit.event.ArrayBlockingQueuedEvent
+import org.grails.plugin.queuekit.event.EnhancedPriorityBlockingQueuedEvent
+import org.grails.plugin.queuekit.event.LinkedBlockingQueuedEvent
+import org.grails.plugin.queuekit.event.PriorityBlockingQueuedEvent
 import org.grails.plugin.queuekit.priority.ComparableFutureTask
 import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.Priority
@@ -15,8 +28,6 @@ import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
 import org.grails.plugin.queuekit.validation.ChangeConfigBean
 import org.grails.plugin.queuekit.validation.QueueKitBean
 import org.grails.plugin.queuekit.validation.ReportsQueueBean
-
-import java.util.concurrent.RunnableFuture
 
 /**
  * QueueReportService is the main service that interacts with 
@@ -27,12 +38,11 @@ import java.util.concurrent.RunnableFuture
  * buildReport  -> Two ways of being called  
  *
  */
-class QueueReportService implements GrailsApplicationAware {
+class QueueReportService {
 
-	def config
-	GrailsApplication grailsApplication
-
+	def grailsApplication
 	def queuekitExecutorBaseService
+
 	def enhancedPriorityBlockingExecutor
 	def priorityBlockingExecutor
 	def linkedBlockingExecutor
@@ -49,11 +59,11 @@ class QueueReportService implements GrailsApplicationAware {
 	 * @param authorized
 	 * @return
 	 */
-	def delete(Long id,Long userId, boolean authorized,boolean safeDel) {
+	def delete(Long id,Long userId, boolean authorized,boolean safeDel) {		
 		ReportsQueue c=ReportsQueue.get(id)
 		if (!c) return null
 		boolean deleted=false
-		if ((c.userId==userId||authorized) && (!safeDel||(safeDel && c.status==ReportsQueue.DOWNLOADED))) {
+		if ((c.userId==userId||authorized) && (!safeDel||(safeDel && c.status==ReportsQueue.DOWNLOADED))) {			
 			if (c.fileName) {
 				File file = new File(c.fileName)
 				if (file) {
@@ -69,29 +79,29 @@ class QueueReportService implements GrailsApplicationAware {
 			 * with the main call. Thus stopping a live task from execution
 			 * 
 			 */
-
 			if (c.isEnhancedPriority()) {
-
 				boolean cancelled=false
-
 				/*
 				 * Check to see if is a running task ?
 				 */
-
 				ComparableFutureTask task = EnhancedPriorityBlockingExecutor?.runningJobs?.find{it.queueId == c.id}
 				if (task) {
 					statusDeleted(c)
 					task.cancel(true)
 					cancelled=true
 				} else {
-					// Confirm task is not sitting on queue ?
+					/*
+					 *  Confirm task is not sitting on queue ?
+					 */
 					ComparableFutureTask fTask = enhancedPriorityBlockingExecutor?.getQueue()?.find{it.queueId == c.id}
 					if (fTask) {
-						// It was found on queue cancel task
+						/*
+						 *  It was found on queue cancel task
+						 */
+						statusDeleted(c)
 						fTask.cancel(true)
 						cancelled=true
 					}
-					statusDeleted(c)
 				}
 
 				/*
@@ -100,7 +110,6 @@ class QueueReportService implements GrailsApplicationAware {
 				if (cancelled) {
 					enhancedPriorityBlockingExecutor.purge()
 				}
-
 			} else {
 				/*
 				 * All other ThreadExecutors 
@@ -148,8 +157,8 @@ class QueueReportService implements GrailsApplicationAware {
 		}
 		return result
 	}
-	
-	
+
+
 
 	/**
 	 *  Simply update queue with status Downloaded
@@ -191,7 +200,7 @@ class QueueReportService implements GrailsApplicationAware {
 				ArrayBlockingExecutor ex = new ArrayBlockingExecutor()
 				if (changeType == ChangeConfigBean.POOL) {
 					ex.maximumPoolSize=changeValue
-				} else if (changeType == ChangeConfigBean.MAXQUEUE) {
+				} else if (changeType == ChangeConfigBean.MAXQUEUE) {				
 					ex.maxQueue=changeValue
 				} else if (changeType == ChangeConfigBean.CHECKQUEUE) {
 					queuekitExecutorBaseService.checkQueue(ArrayBlockingReportsQueue.class)
@@ -215,6 +224,7 @@ class QueueReportService implements GrailsApplicationAware {
 				break
 			case ChangeConfigBean.MAXQUEUE:
 				ex.maxQueue=changeValue
+				break
 			case ChangeConfigBean.PRESERVE:
 				if (changeValue < ex.maximumPoolSize) {
 					ex.minPreserve=changeValue
@@ -236,11 +246,10 @@ class QueueReportService implements GrailsApplicationAware {
 				ex.limitUserBelowPriority=changeValue
 				break
 			case ChangeConfigBean.FLOODCONTROL:
-				ex.forceFloodControl=floodControl
+				ex.forceFloodControl=(floodControl)
 				break
 		}
 	}
-
 	/**
 	 * As per name when user selects
 	 * modify priority on a given queue item
@@ -358,7 +367,7 @@ class QueueReportService implements GrailsApplicationAware {
 	}
 
 	/**
-	 * Quartz Schedule: run this as a scheduled task
+	 * Quartz Schedule: this task
 	 * @return
 	 */
 	def deleteReportFiles() {
@@ -456,22 +465,22 @@ class QueueReportService implements GrailsApplicationAware {
 				where=addClause(where,'rq.userId=:userId')
 				whereParams.userId=bean.userId
 			}
-		}
+		}		
 		if (!bean.superUser && bean.status!=ReportsQueue.DOWNLOADED ||bean.superUser && (bean.status!=ReportsQueue.DELETED||bean.status!=ReportsQueue.DOWNLOADED)) {
-
+			
 			where=addClause(where,'rq.status not in (:statuses) ')
 			def statuses=[]
-
+			
 			if (!bean.superUser||bean.superUser && bean.status != ReportsQueue.DOWNLOADED) {
 				statuses << ReportsQueue.DOWNLOADED
 			}
 			if (!bean.superUser||bean.superUser && bean.status != ReportsQueue.DELETED) {
 				statuses << ReportsQueue.DELETED
 			}
-			whereParams.statuses=statuses
+			whereParams.statuses=statuses			
 		}
 
-		if (bean.status) {
+		if (bean.status) {			
 			where=addClause(where,'rq.status=:status')
 			whereParams.status=bean.status
 		}
@@ -540,7 +549,7 @@ class QueueReportService implements GrailsApplicationAware {
 		instanceList << [reportJobs:queueTypes]
 
 		return [instanceList:instanceList,instanceTotal:total, superUser:bean.superUser,statuses:bean.statuses,
-				searchList:bean.searchList, deleteList:bean.deleteList, adminButtons:bean.adminButtons]
+			searchList:bean.searchList, deleteList:bean.deleteList, adminButtons:bean.adminButtons]
 	}
 
 	/**
@@ -598,10 +607,11 @@ class QueueReportService implements GrailsApplicationAware {
 		}
 
 		return [queueType:queueType ?: ReportsQueue.ENHANCEDPRIORITYBLOCKING  , maxPoolSize:maxPoolSize,
-				limitUserBelowPriority:limitUserBelowPriority,limitUserAbovePriority:limitUserAbovePriority,
-				forceFloodControl:forceFloodControl,isAdvanced:isAdvanced,maxQueue:maxQueue,
-				running:running,queued:queued,minPreserve:minPreserve,priority:priority,executorCount:executorCount]
+			limitUserBelowPriority:limitUserBelowPriority,limitUserAbovePriority:limitUserAbovePriority,
+			forceFloodControl:forceFloodControl,isAdvanced:isAdvanced,maxQueue:maxQueue,
+			running:running,queued:queued,minPreserve:minPreserve,priority:priority,executorCount:executorCount]
 	}
+
 	/**
 	 * Main point of buildReport used by binding to ReportsQueueBean
 	 * refer to ReportsDemoController / indexBean example
@@ -836,23 +846,23 @@ class QueueReportService implements GrailsApplicationAware {
 		 * lets capture it and slow down the pace a little
 		 *  
 		 */
-		//new Thread({
-		//	sleep(500)
+		new Thread({
+			sleep(500)
 			switch (queue?.queueLabel) {
 				case ReportsQueue.LINKEDBLOCKING:
-					notify( "method.linkedBlocking",queue.id)
+					publishEvent(new LinkedBlockingQueuedEvent(queue.id))
 					break
 				case ReportsQueue.ARRAYBLOCKING:
-					notify( "method.arrayBlocking",queue.id)
+					publishEvent(new ArrayBlockingQueuedEvent(queue.id))
 					break
 				case ReportsQueue.PRIORITYBLOCKING:
-					notify( "method.priorityBlocking",queue.id)
+					publishEvent(new PriorityBlockingQueuedEvent(queue.id))
 					break
 				case ReportsQueue.ENHANCEDPRIORITYBLOCKING:
-					notify( "method.enhancedPriorityBlocking",queue.id)
+					publishEvent(new EnhancedPriorityBlockingQueuedEvent(queue.id))
 					break
 			}
-		//} as Runnable ).start()
+		} as Runnable ).start()
 		return queue
 	}
 
@@ -860,7 +870,7 @@ class QueueReportService implements GrailsApplicationAware {
 		return (where ? where + ' and ' : 'where ') + clause
 	}
 
-	void setGrailsApplication(GrailsApplication ga) {
-		config = ga.config.queuekit
+	ConfigObject getConfig() {
+		return grailsApplication.config.queuekit ?: ''
 	}
 }

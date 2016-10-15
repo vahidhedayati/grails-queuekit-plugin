@@ -5,6 +5,8 @@
 		<meta name="layout" content="main" />
 		<g:set var="entityName" value="${message(code: 'queuekit.reportDownload.label')}" scope="request" />
 		<title><g:message code="queuekit.list.label" args="[entityName]" /></title>
+		<asset:javascript src="bootstrap.js" />
+		<asset:stylesheet href="bootstrap.css" />
 		<style type="text/css">
 		html,body {
 			max-width: 100% !important;
@@ -138,22 +140,22 @@
 			margin: 0 0 5px 0px;
 			background-color: #168ccc;
 		}
-		</style>
-	</head>
+</style>
+</head>
 <body>
-<div id="results">
-	<g:render template="list" />
-</div>
-
-<div id="modalcontainer" style="display:none;">
-	<g:render template="/modalDialog"/>
-</div>
+	<div id="results">
+		<g:render template="list" />
+	</div>	
+	
+	<div id="modalcontainer" style="display:none;">
+		<g:render template="/modalDialog"/>
+	</div>
 
 <script>
 	function reloadPage() {
 		var url="${createLink(controller: 'queueKit',action:'listQueue')}";
 		$.ajax({
-			cache:false,
+			cache:false,			
 			timeout:1000,
 			type: 'POST',
 			url: url,
@@ -165,16 +167,19 @@
 	}
 	function doDelete(id) {
 		if (confirm('${message(code: 'queuekit.deleteWarning.message')}')) {
-			ajaxCall('D',id)
+		 	ajaxCall('D',id)
 		}
 	}
+	function doSafeDelete(id) {		
+		ajaxCall('S',id)		
+	}
 	function doRequeue(id) {
-		ajaxCall('R',id)
+		 ajaxCall('R',id)
 	}
 	function doDownload(id) {
 		window.location.href="${createLink(action: "download", absolute: true)}/"+id;
 	}
-
+	
 	function doDisplay(id) {
 		var params=$.param({id:id});
 		var title = "${g.message(code: 'queuekit.showRecord.message')}";
@@ -190,7 +195,7 @@
 		var title = "${g.message(code: 'queuekit.changeConfig.label')}";
 		return showDialog('${createLink(controller:'queueKit',action:'changeConfig')}?'+params,title);
 	}
-
+	
 	function showDialog(url,title) {
 		$('#modalCase').modal('show');
 		$.get(url,function(data){
@@ -203,6 +208,8 @@
 		var url
 		if (method=='D') {
 			url="${createLink(action: "delRecord")}/"+id;
+		} else if (method == 'S') {
+			url="${createLink(action: "delRecord")}/?safeDel=${true}&id="+id;	
 		} else if (method == 'R') {
 			url="${createLink(action: "requeue")}/"+id;
 		}
@@ -216,7 +223,7 @@
 		});
 	}
 	function postAction(method) {
-		var url="${createLink(controller: 'queueKit',action:'deleteAll')}/?deleteBy="+method;
+		var url="${createLink(controller: 'queueKit',action:'deleteAll')}/?deleteBy="+method;			
 		$.ajax({
 			type: 'POST',
 			url: url,
