@@ -1,7 +1,7 @@
 <%@ page import="org.grails.plugin.queuekit.ReportsQueue" %>
 <g:set var="entityName" value="${message(code: 'queuekit.reportDownload.label')}" scope="request" />
 
-<g:render template="/queueKit/search" model="${[search:instanceList.search,superUser:superUser]}"/>
+<g:render template="/queueKit/search" />
 
 <g:set var="dateFormat" value="${message(code: 'queuekit.reportDate.format')}"/>
 <div class="content" role="main" id="results">	
