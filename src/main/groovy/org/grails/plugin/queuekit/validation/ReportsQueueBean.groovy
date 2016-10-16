@@ -59,7 +59,7 @@ class ReportsQueueBean implements Validateable {
 	/*
 	 * sets up the bean according to a DB entry 
 	 */
-	def formatBean(ReportsQueue queue) {
+	def formatBean(queue) {
 		id=queue.id
 		reportName=queue.reportName
 		displayName=queue.displayName
@@ -71,15 +71,18 @@ class ReportsQueueBean implements Validateable {
 		status=queue.status
 		queueType=queue.queueLabel
 		retries=queue.retries
+		
 		if (queue.manualDownload) {
 			manualDownload=queue.manualDownload
 		}
+		
 		if (queue.hasPriority()) {
-			priority = queue.priority ?:queue.defaultPriority
+                    priority = queue?.priority ?:queue?.defaultPriority
 		}
+		
 		username=queuekitUserService.getUsername(userId)
-		fromAction=queue.fromAction
-		fromController=queue.fromController
+		fromAction=queue?.fromAction
+		fromController=queue?.fromController
 		return this
 	}
 

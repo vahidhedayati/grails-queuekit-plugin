@@ -1,6 +1,7 @@
 package org.grails.plugin.queuekit
 
 import grails.converters.JSON
+import org.grails.plugin.queuekit.priority.Priority
 
 /**
  * When a request is made to save or run something on the reportsQueue
@@ -95,6 +96,10 @@ class ReportsQueue {
 		return "${reportName}-${created}"
 	}
 
+	Priority getDefaultPriority() {
+		return QueuekitHelper.sortPriority(reportName) ?: Priority.LOW
+	}
+	
 	Boolean hasPriority() {
 		return false
 	}

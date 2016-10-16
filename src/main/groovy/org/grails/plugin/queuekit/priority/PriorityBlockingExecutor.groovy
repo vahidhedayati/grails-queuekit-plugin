@@ -173,4 +173,34 @@ class PriorityBlockingExecutor extends ThreadPoolExecutor {
 
 		super.execute(task)
 	}
+
+	/**
+	 * Grails 3 being fussier about setting/overriding
+	 * static variables
+	 * will copy methods to grails 2 to keep things consistent
+	 */
+	void setMaximumPoolSize(int i) {
+		this.maximumPoolSize=i
+	}
+	void setMaxQueue(int i) {
+		this.maxQueue=i
+	}
+	void setMinPreserve(int i) {
+		this.minPreserve=i
+	}
+	void setDefinedPriority(Priority p) {
+		this.definedPriority=p
+	}
+	void setForceFloodControl(int i) {
+		this.forceFloodControl=i
+	}
+	void setLimitUserAbovePriority(int i) {
+		this.limitUserAbovePriority=i
+	}
+	void setLimitUserBelowPriority(int i) {
+		this.limitUserBelowPriority=i
+	}
+	void setDefaultComparator(boolean b) {
+		this.defaultComparator=b
+	}
 }

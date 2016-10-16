@@ -15,7 +15,7 @@ class QueueKitBean implements Validateable {
 	static final List SEARCH_TYPES=[USER,REPORTNAME]
 
 	static final String DELALL='AL'
-	static final List deleteList = ReportsQueue.REPORT_STATUS_ALL-[ReportsQueue.DELETED,ReportsQueue.RUNNING]+[DELALL]
+	static final List deleteList = ReportsQueue.REPORT_STATUS_ALL-[ReportsQueue.DELETED,ReportsQueue.RUNNING,ReportsQueue.OTHERUSERS]+[DELALL]
 
 	Long userId
 

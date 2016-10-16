@@ -22,10 +22,10 @@ queuekit
 
 ### Grails 3: 
 ```groovy
-compile "org.grails.plugins:queuekit:1.0"
+compile "org.grails.plugins:queuekit:1.2"
 ```
  
-##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/) | [demo](https://github.com/vahidhedayati/test-queuekit3/)
+##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/) | [demo](https://github.com/vahidhedayati/test-queuekit3/) 
 
 ### Grails 2: 
 ```groovy
@@ -38,6 +38,8 @@ compile ":queuekit:1.0"
 ## 2.[Configuration](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/master/grails-app/conf/SampleConfig.groovy)
 The configuration provided would be added to Config.groovy on grails 2 and application.groovy in grails 3.
 
+
+### [Video 1: Walk through grails 3](https://www.youtube.com/watch?v=JXjZctS92Sc) | [Video 2: Grails 2 stopping running task walk through](https://www.youtube.com/watch?v=sS4JL97ex74)
 
 ## 3.Information
 =====
@@ -235,11 +237,32 @@ class ParamsExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
 
+    /*
+     * Must be declared otherwise class errors.    
+     * Requirement from QueuekitBaseReportsService
+     * If you do not have any values to set copy and paste as below
+     */
+    Priority getQueuePriority(ReportsQueue queue, Map params) {
+		Priority priority = queue.priority ?: queue.defaultPriority		
+		return priority
+	}
+	
+    /*
+	 * Must be declared gives you params 
+	 * You must run your service to get back the results
+	 * Push results params and queue into runReport as show
+	 */
 	def runReport(ReportsQueue queue,Map params) {
 		def queryResults = tsvService.runParams(params)
 		runReport(queue,queryResults,params)
 	}
 
+    /*
+     * You must define this as shown. Plugin will provide you at this point
+     * with out. Push out queryResults and bean = your original params back into 
+     * your own custom method which like shown above iterates through your list
+     * and pushes into out
+     */
 	def actionInternal(out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}

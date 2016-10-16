@@ -40,7 +40,23 @@ class QueueKitController {
 	 */
 	def display() {
 		if (params.id) {
-			ReportsQueue queue = ReportsQueue.load(params.long('id'))
+			def queue
+			switch (params?.queueType) {
+				case ReportsQueue.LINKEDBLOCKING:
+					queue = LinkedBlockingReportsQueue.load(params.long('id'))
+					break
+				case ReportsQueue.ARRAYBLOCKING:
+					queue = ArrayBlockingReportsQueue.load(params.long('id'))
+					break
+				case ReportsQueue.PRIORITYBLOCKING:
+					queue = PriorityBlockingReportsQueue.load(params.long('id'))
+					break
+				case ReportsQueue.ENHANCEDPRIORITYBLOCKING:
+					queue = EnhancedPriorityBlockingReportsQueue.load(params.long('id'))
+					break
+				default:
+					queue = ReportsQueue.load(params.long('id'))
+			}
 			ReportsQueueBean bean = new ReportsQueueBean().formatBean(queue)
 			if (request.xhr) {
 				render template:'showContent',model:[instance:bean]
@@ -220,7 +236,7 @@ class QueueKitController {
 
 	def modifyConfig(ChangeConfigBean bean) {
 		if (queuekitUserService.isSuperUser(queuekitUserService.currentuser) &&bean.validate()) {
-			queueReportService.modifyConfiguration(bean.queueType?:bean.queue,bean.changeValue, bean.changeType,bean.priority,bean.floodControl)
+			queueReportService.modifyConfiguration(bean.queueType?:bean.queue,bean.changeValue, bean.changeType,bean.priority,bean.floodControl, bean.defaultComparator)
 			response.status=response.SC_CREATED
 			listQueue()
 			return

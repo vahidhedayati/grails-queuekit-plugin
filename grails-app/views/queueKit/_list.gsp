@@ -10,15 +10,16 @@
 			<g:each in="${instanceList.reportJobs}" var="reportJob">
 			<div class="col-sm-12 well">
 				<g:message code="reportThreadLimit${reportJob.isAdvanced?'Advanced':''}.${reportJob.queueType}${reportJob.minPreserve?'':'.label'}" 
-				args="${[reportJob.maxPoolSize,reportJob.running,reportJob.queued,reportJob.minPreserve,reportJob.priority,reportJob.limitUserBelowPriority,reportJob.limitUserAbovePriority,reportJob.forceFloodControl]}"/>								
+				args="${[reportJob.maxPoolSize,reportJob.running,reportJob.queued,reportJob.minPreserve,reportJob.priority,
+					reportJob.limitUserBelowPriority,reportJob.limitUserAbovePriority,reportJob.forceFloodControl,reportJob.maxQueue]}"/>								
 				<g:if test="${reportJob.executorCount}">
-					<div class="alert alert-success">
+					<div class="alert alert-success"><span class="circle"></span> 
 						<g:message code="userThreadbreakDown.label" args="${[reportJob.executorCount.userRunningBelow,reportJob.executorCount.userRunningAbove,
-							reportJob.executorCount.userBelow,reportJob.executorCount.userAbove,reportJob.priority]}"/>
+							reportJob.executorCount.userBelow,reportJob.executorCount.userAbove,reportJob.priority?:'']}"/>
 					</div>
-					<div class="alert alert-warning">	
-						<g:message code="reportThreadbreakDown.label" args="${[reportJob.executorCount.runningBelow,reportJob.executorCount.runningAbove,
-							reportJob.executorCount.queuedBelow,reportJob.executorCount.queuedAbove,reportJob.priority]}"/>
+					<div class="alert alert-warning">
+						<span class="circle"></span> <g:message code="reportThreadbreakDown.label" args="${[reportJob.executorCount.runningBelow,reportJob.executorCount.runningAbove,
+							reportJob.executorCount.queuedBelow,reportJob.executorCount.queuedAbove,reportJob.priority?:'']}"/>
 					</div>
 				</g:if>
 			</div>
@@ -74,7 +75,7 @@
 					</g:elseif>
 					<g:else>
 					<i  class="btn btn-default" id="${reportInstance.id}">
-						<g:message code="queuekit.reportType.${reportInstance.status}"/>
+					<g:message code="queuekit.reportType.${reportInstance.status}"/>
 					</i>
 					</g:else>					
 					<a  class="btn btn-default actionButton" data-toggle="dropdown"
@@ -94,10 +95,7 @@
 		<li id="queueDelete"> <a>${deleteLabel}</a></li>
 		
 		<g:if test="${superUser}">
-		<li id="qeuePriority"><a><g:message code="queuekit.changePriority.label"/></a></li>			
-		<li class="divider"></li>
-		<li id="increasePool"><a><g:message code="queuekit.adminButton.PO"/></a></li>
-		<li id="increasePreserve"><a><g:message code="queuekit.adminButton.PR"/></a></li>
+		<li id="qeuePriority"><a><g:message code="queuekit.changePriority.label"/></a></li>		
 		</g:if>
 		</ul>
 	
@@ -107,7 +105,7 @@
 	</div>
 
 	<script>
-	$(function() {
+	$(function() {		
 		toggleBlock('#jobCtrl','.jobList');		
 		var showJobControl="${search.jobControl}";
 		if (showJobControl=='true') {
@@ -137,11 +135,9 @@
 			$(this).after($dropdown);	
 			$dropdown.find("#queueDelete").attr("onclick", "javascript:doDelete("+id+");");
 			$dropdown.find("#downloadAgain").attr("onclick", "javascript:doDownload("+id+");");
-			$dropdown.find("#queueDisplay").attr("onclick", "javascript:doDisplay('"+id+"');");	
+			$dropdown.find("#queueDisplay").attr("onclick", "javascript:doDisplay('"+id+"','"+queuetype+"');");	
 			$dropdown.find("#queueRequeue").attr("onclick", "javascript:doRequeue('"+id+"');");
 			$dropdown.find("#qeuePriority").attr("onclick", "javascript:doPriority('"+id+"');");
-			$dropdown.find("#increasePool").attr("onclick", "javascript:doConfigChange('"+id+"','PO');");
-			$dropdown.find("#increasePreserve").attr("onclick", "javascript:doConfigChange('"+id+"','PR');");				
 			$(this).dropdown();				
 			var running= status=='${ReportsQueue.RUNNING}';
 			var deleted= status=='${ReportsQueue.DELETED}';
@@ -153,11 +149,8 @@
 			$('#qeuePriority')[(queued && enhancedQueue) ?'show':'hide']();
 			var arrayQueue = queuetype=='${ReportsQueue.ARRAYBLOCKING}';
 			var issue = (status=='${ReportsQueue.QUEUED}' || status=='${ReportsQueue.ERROR}');
-			$('#queueRequeue')[arrayQueue && issue ?'show':'hide']();
-			$('#increasePreserve')[(enhancedQueue||priorityQueue) ?'show':'hide']();
-			$('#increasePool')['show']();
-			$('#downloadAgain')[downloaded ? 'show':'hide']();
-										
+			$('#queueRequeue')[arrayQueue && issue ?'show':'hide']();			
+			$('#downloadAgain')[downloaded ? 'show':'hide']();										
 		});
 	});
 	</script>

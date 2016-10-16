@@ -25,10 +25,6 @@ class EnhancedPriorityBlockingReportsQueue extends ReportsQueue {
 		return ENHANCEDPRIORITYBLOCKING
 	}
 	
-	Priority getDefaultPriority() {
-		return QueuekitHelper.sortPriority(reportName) ?: Priority.LOW
-	}
-	
 	Boolean hasPriority() {
 		return true
 	}
