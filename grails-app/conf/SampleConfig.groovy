@@ -6,7 +6,7 @@ queuekit {
 	keepAliveTime=300
 	
 	/*
-	 * corePoolSize
+	 * corePoolSize this should match maximumPoolSize
 	 * 
 	 */
 	corePoolSize=3

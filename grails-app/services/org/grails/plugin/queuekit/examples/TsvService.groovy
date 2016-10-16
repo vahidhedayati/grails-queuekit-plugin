@@ -62,7 +62,7 @@ class TsvService {
 			while (i < 4500 ) {
 				results << [ id: i, text: new UID().toString() + prng.nextLong() +System.currentTimeMillis() ]
 				//sleep(random.nextInt(doSleep ? ((i % 2) == 0 ? 40 : 10) : ((i % 2) == 0 ? 20 : 5)))
-				sleep(random.nextInt(doSleep ? ((i % 2) == 0 ? 60 : 15) : ((i % 2) == 0 ? 17 : 9)))
+				sleep(random.nextInt(doSleep ? ((i % 2) == 0 ? 40 : 15) : ((i % 2) == 0 ? 17 : 9)))
 				log.info "working on ${i} "
 				i++
 			}

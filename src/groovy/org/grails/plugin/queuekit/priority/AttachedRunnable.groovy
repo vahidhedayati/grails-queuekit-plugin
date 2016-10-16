@@ -44,6 +44,7 @@ class AttachedRunnable implements Runnable {
 			 * to then finally kill running task
 			 * 
 			 */
+			
 			t = new Thread({currentService.runReport(queue,paramsMap)} as Runnable)
 			int i=0
 			while (!t.isInterrupted() || !shutdown) {
@@ -51,6 +52,7 @@ class AttachedRunnable implements Runnable {
 					t.start()
 					i++
 				}
+				
 				/**
 				 * WARNING - This is deprecated usage of stop and is UNSAFE !.
 				 * 
@@ -58,13 +60,14 @@ class AttachedRunnable implements Runnable {
 				 * this should hopefully be fine to kill off
 				 * 
 				 */
-				if (t.isInterrupted()||shutdown||!t.isAlive()) {
-					t.interrupt()
-					t.stop()
+				if (t.isInterrupted()||shutdown||!t.isAlive()) {					
 					break
 				}
 			}
-
+			if (shutdown) {
+				t.interrupt()
+				t.stop()
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace()
 			t.interrupt()

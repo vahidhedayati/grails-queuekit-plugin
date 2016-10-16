@@ -1,9 +1,9 @@
 package org.grails.plugin.queuekit
 
-import org.grails.plugin.queuekit.priority.Priority
 import org.grails.plugin.queuekit.validation.ChangeConfigBean
 import org.grails.plugin.queuekit.validation.ChangePriorityBean
 import org.grails.plugin.queuekit.validation.QueueKitBean
+import org.grails.plugin.queuekit.validation.QueuekitLists
 import org.grails.plugin.queuekit.validation.ReportsQueueBean
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -168,7 +168,7 @@ class QueueKitController {
 	def deleteAll(QueueKitBean bean) {
 		bean.userId = queuekitUserService.currentuser
 		boolean success
-		if (QueueKitBean.deleteList.contains(bean.deleteBy)) {
+		if (QueuekitLists.deleteList.contains(bean.deleteBy)) {
 			success = queueReportService.clearUserReports(bean,bean.deleteBy)
 		}
 		response.status=success ? response.SC_CREATED : response.SC_CONFLICT

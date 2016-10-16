@@ -3,17 +3,31 @@ package org.grails.plugin.queuekit
 import grails.converters.JSON
 import grails.util.Holders
 
+import org.grails.plugin.queuekit.priority.CompareFutureTask
+import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.Priority
+import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
 
+/**
+ * 
+ * One of those important classes I nearly forgot about
+ * When a request comes in it is a ComparableRunnable unless it is a 
+ * PriorityBlocking. It won't this this. 
+ * EnhancedPriorityBlocking actually becomes 
+ * CompareFutureTask and the comparison is done there
+ * 
+ * @author Vahid Hedayati
+ *
+ */
 class ComparableRunnable implements Runnable, Comparable {
 	
 
 	private ReportsQueue queue
-
+	
 	public ComparableRunnable(ReportsQueue queue){
 		this.queue=queue
 	}
-
+	
 	/**
 	 * Runnable finds queue.reportName
 	 * calls .execute on relevant service bound to reportName
@@ -63,8 +77,15 @@ class ComparableRunnable implements Runnable, Comparable {
 		def currentService =  Holders.grailsApplication.mainContext.getBean(name)		
 		Priority lhs = currentService.getQueuePriority(this.queue,JSON.parse(this.queue.paramsMap))
 		if (o instanceof ComparableRunnable) {
+			name = o.queue.reportName+o.queue.serviceLabel
+			currentService =  Holders.grailsApplication.mainContext.getBean(name)
 			Priority rhs = currentService.getQueuePriority(o.queue,JSON.parse(o.queue.paramsMap))
-			i = lhs.getValue() <=> rhs.getValue()		
+			//i = lhs.getValue() <=> rhs.getValue()			
+			if (lhs.value < rhs.value) {
+				i=-1
+			} else if (lhs.value > rhs.value) {
+				i=1
+			}
 		}
 		return i
 	}

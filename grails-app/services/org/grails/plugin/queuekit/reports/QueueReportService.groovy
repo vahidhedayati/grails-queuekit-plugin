@@ -98,11 +98,11 @@ class QueueReportService {
 					if (fTask) {
 						/*
 						 *  It was found on queue cancel task
-						 */
-						statusDeleted(c)
+						 */						
 						fTask.cancel(true)
 						cancelled=true
 					}
+					statusDeleted(c)
 				}
 
 				/*
@@ -313,7 +313,7 @@ class QueueReportService {
 	boolean clearUserReports(QueueKitBean bean, String deleteType) {
 		def query=" from ReportsQueue rq where rq.userId =:currentUser and "
 		def whereParams=[:]
-		if (deleteType==QueueKitBean.DELALL) {
+		if (deleteType==QueuekitLists.DELALL) {
 			query +="rq.status != :running and rq.status!=:deleted"
 			whereParams.running=ReportsQueue.RUNNING
 			whereParams.deleted=ReportsQueue.DELETED
