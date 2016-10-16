@@ -30,10 +30,6 @@ class PriorityBlockingReportsQueue extends ReportsQueue {
 		return true
 	}
 	
-	Priority getDefaultPriority() {
-		return QueuekitHelper.sortPriority(reportName) ?: Priority.LOW
-	}
-	
 	static mapping = {
 		priority(enumType:'string',sqlType:'char(20)')
 	}

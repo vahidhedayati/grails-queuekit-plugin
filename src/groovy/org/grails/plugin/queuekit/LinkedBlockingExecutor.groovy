@@ -78,6 +78,18 @@ class LinkedBlockingExecutor extends ThreadPoolExecutor {
 	public ComparableFutureTask execute(Runnable command, Long queueId) {
 		ComparableFutureTask task = new ComparableFutureTask(command,null)
 		super.execute(task)		
-	}	
+	}
+	
+	/**
+	 * Grails 3 being fussier about setting/overriding
+	 * static variables
+	 * will copy methods to grails 2 to keep things consistent
+	 */
+	void setMaximumPoolSize(int i) {
+		this.maximumPoolSize=i
+	}
+	void setMaxQueue(int i) {
+		this.maxQueue=i
+	}
 	
 }

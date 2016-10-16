@@ -135,7 +135,7 @@
 			$(this).after($dropdown);	
 			$dropdown.find("#queueDelete").attr("onclick", "javascript:doDelete("+id+");");
 			$dropdown.find("#downloadAgain").attr("onclick", "javascript:doDownload("+id+");");
-			$dropdown.find("#queueDisplay").attr("onclick", "javascript:doDisplay('"+id+"');");	
+			$dropdown.find("#queueDisplay").attr("onclick", "javascript:doDisplay('"+id+"','"+queuetype+"');");	
 			$dropdown.find("#queueRequeue").attr("onclick", "javascript:doRequeue('"+id+"');");
 			$dropdown.find("#qeuePriority").attr("onclick", "javascript:doPriority('"+id+"');");
 			$(this).dropdown();				

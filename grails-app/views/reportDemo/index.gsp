@@ -132,11 +132,32 @@ class ParamsExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
 
+    /*
+     * Must be declared otherwise class errors.    
+     * Requirement from QueuekitBaseReportsService
+     * If you do not have any values to set copy and paste as below
+     */
+    Priority getQueuePriority(ReportsQueue queue, Map params) {
+		Priority priority = queue.priority ?: queue.defaultPriority		
+		return priority
+	}
+	
+    /*
+	 * Must be declared gives you params 
+	 * You must run your service to get back the results
+	 * Push results params and queue into runReport as show
+	 */
 	def runReport(ReportsQueue queue,Map params) {
 		def queryResults = tsvService.runParams(params)
 		runReport(queue,queryResults,params)
 	}
 
+    /*
+     * You must define this as shown. Plugin will provide you at this point
+     * with out. Push out queryResults and bean = your original params back into 
+     * your own custom method which like shown above iterates through your list
+     * and pushes into out
+     */
 	def actionInternal(out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}

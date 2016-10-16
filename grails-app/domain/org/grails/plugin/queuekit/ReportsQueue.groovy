@@ -2,6 +2,8 @@ package org.grails.plugin.queuekit
 
 import grails.converters.JSON
 
+import org.grails.plugin.queuekit.priority.Priority
+
 /**
  * When a request is made to save or run something on the reportsQueue
  * it is saved here. The main object extends over 3 different calls and classes 
@@ -74,6 +76,10 @@ class ReportsQueue {
 
 	String getQueueLabel() {
 		return null
+	}
+	
+	Priority getDefaultPriority() {
+		return QueuekitHelper.sortPriority(reportName) ?: Priority.LOW
 	}
 	
 	/**

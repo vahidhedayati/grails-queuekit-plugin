@@ -182,7 +182,7 @@ class QueueReportService {
 	 * @param priority
 	 * @return
 	 */
-	def modifyConfiguration(String queueLabel,int changeValue, String changeType, Priority priority=Priority.MEDIUM, int floodControl) {
+	def modifyConfiguration(String queueLabel,int changeValue, String changeType, Priority priority=Priority.MEDIUM, int floodControl, boolean defaultComparator) {
 		switch (queueLabel) {
 			case ReportsQueue.LINKEDBLOCKING:
 				LinkedBlockingExecutor ex = new LinkedBlockingExecutor()
@@ -208,16 +208,16 @@ class QueueReportService {
 				break
 			case ReportsQueue.PRIORITYBLOCKING:
 				PriorityBlockingExecutor ex = new PriorityBlockingExecutor()
-				actionModifyType(changeType,changeValue,priority,floodControl,ex,priorityBlockingExecutor)
+				actionModifyType(changeType,changeValue,priority,floodControl,ex,priorityBlockingExecutor, defaultComparator)
 				break
 			case ReportsQueue.ENHANCEDPRIORITYBLOCKING:
 				EnhancedPriorityBlockingExecutor ex = new EnhancedPriorityBlockingExecutor()
-				actionModifyType(changeType,changeValue,priority,floodControl,ex,enhancedPriorityBlockingExecutor)
+				actionModifyType(changeType,changeValue,priority,floodControl,ex,enhancedPriorityBlockingExecutor, defaultComparator)
 				break
 		}
 	}
 
-	private void actionModifyType(String changeType,int changeValue,Priority priority=Priority.MEDIUM,int floodControl,ex,executor) {
+	private void actionModifyType(String changeType,int changeValue,Priority priority=Priority.MEDIUM,int floodControl,ex,executor,boolean defaultComparator) {
 		switch (changeType) {
 			case ChangeConfigBean.POOL:
 				ex.maximumPoolSize=changeValue
@@ -236,6 +236,9 @@ class QueueReportService {
 					queuekitExecutorBaseService.checkQueue(ex.class)
 				}
 				break
+			case ChangeConfigBean.DEFAULTCOMPARATOR:
+				ex.defaultComparator=defaultComparator
+				break	
 			case ChangeConfigBean.STOPEXECUTOR:
 				executor.shutdown()
 				break
@@ -457,30 +460,30 @@ class QueueReportService {
 	)
 	from ReportsQueue rq  """
 
-		if (bean.userSearchId) {
+		if (bean.superUser && bean.userSearchId) {
 			where=addClause(where,'rq.userId=:userSearchId')
 			whereParams.userSearchId=bean.userSearchId
 		} else {
-			if (!bean.superUser || (bean.superUser && bean.status != ReportsQueue.OTHERUSERS && !bean.userSearchId)) {
+			if (!bean.superUser || (bean.superUser && bean.status != ReportsQueue.OTHERUSERS)) {
 				where=addClause(where,'rq.userId=:userId')
 				whereParams.userId=bean.userId
 			}
-		}		
+		}
 		if (!bean.superUser && bean.status!=ReportsQueue.DOWNLOADED ||bean.superUser && (bean.status!=ReportsQueue.DELETED||bean.status!=ReportsQueue.DOWNLOADED)) {
-			
+
 			where=addClause(where,'rq.status not in (:statuses) ')
 			def statuses=[]
-			
+
 			if (!bean.superUser||bean.superUser && bean.status != ReportsQueue.DOWNLOADED) {
 				statuses << ReportsQueue.DOWNLOADED
 			}
 			if (!bean.superUser||bean.superUser && bean.status != ReportsQueue.DELETED) {
 				statuses << ReportsQueue.DELETED
 			}
-			whereParams.statuses=statuses			
+			whereParams.statuses=statuses
 		}
 
-		if (bean.status) {			
+		if (bean.status && bean.status != ReportsQueue.OTHERUSERS) {
 			where=addClause(where,'rq.status=:status')
 			whereParams.status=bean.status
 		}

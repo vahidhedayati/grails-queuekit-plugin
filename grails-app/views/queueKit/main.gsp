@@ -180,8 +180,8 @@
 		window.location.href="${createLink(action: "download", absolute: true)}/"+id;
 	}
 	
-	function doDisplay(id) {
-		var params=$.param({id:id});
+	function doDisplay(id,queueType) {
+		var params=$.param({id:id,queueType:queueType});
 		var title = "${g.message(code: 'queuekit.showRecord.message')}";
 		return showDialog('${createLink(controller:'queueKit',action:'display')}?'+params,title);
 	}
