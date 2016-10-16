@@ -17,6 +17,7 @@ import java.util.concurrent.RunnableFuture
  * 
  * 
  */
+
 @Consumer
 class EnhancedPriorityBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 

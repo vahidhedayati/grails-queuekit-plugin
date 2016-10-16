@@ -1,4 +1,4 @@
-<%@ page import="org.grails.plugin.queuekit.validation.ChangeConfigBean;org.grails.plugin.queuekit.ReportsQueue;org.grails.plugin.queuekit.validation.QueueKitBean" %>
+<%@ page import="org.grails.plugin.queuekit.validation.QueuekitLists;org.grails.plugin.queuekit.validation.ChangeConfigBean;org.grails.plugin.queuekit.ReportsQueue;org.grails.plugin.queuekit.validation.QueueKitBean" %>
 <g:form name='search' controller='queueKit' class="navbar-trans" action='listQueue' method='post' >
 	<section class="container-fluid" id="section1">
 		<div id="reportResults" class="form-inline nav navbar-trans col-sm-6">			
@@ -27,7 +27,7 @@
 		</li>
 		<li>
 		<g:select name="searchBy" class="form-control small" noSelection="${['':"${g.message(code:'queuekit.searchBy.label')}"]}"
-		from="${searchList}" value="${search?.searchBy}" valueMessagePrefix="queuekit.searchType" />
+		from="${searchList}"  value="${search?.searchBy}" valueMessagePrefix="queuekit.searchType" />
 		</li>
 		<li>
 		<g:select name="status" class="form-control small" from="${statuses}" noSelection="${['':"${g.message(code:'queuekit.chooseStatus.label')}"]}"
@@ -49,7 +49,8 @@
 $(function() {
 	$('#searchFor').on('change', function() {		
 		var value = $('#searchFor').val();
-		if (value!='') {
+		var searchBy=$('#searchBy').val();
+		if (value!='' && searchBy=='') {
 			$('#searchBy').attr('required',true);
 		} else {
 			$('#searchBy').attr('required',false);
@@ -57,7 +58,7 @@ $(function() {
 	});
 	$('#deleteOption').on('change', function() {
 		var value = $('#deleteOption').val();
-		if (value=='${QueueKitBean.DELALL}') {
+		if (value=='${QueuekitLists.DELALL}') {
 			if ( confirm('${message(code: 'queuekit.DeleteAllConfirm.message')}')) { 
 				postAction(value);
 			}
@@ -65,14 +66,14 @@ $(function() {
 			postAction(value);
 		}
 	});
-	var adminMessages = {"${ChangeConfigBean.POOL}":"${g.message(code:'queuekit.adminButton.PO')}",
-            "${ChangeConfigBean.PRESERVE}":"${g.message(code:'queuekit.adminButton.PR')}",
-            "${ChangeConfigBean.CHECKQUEUE}":"${g.message(code:'queuekit.adminButton.CQ')}",
-            "${ChangeConfigBean.STOPEXECUTOR}":"${g.message(code:'queuekit.adminButton.ST')}",
-            "${ChangeConfigBean.LIMITUSERABOVE}":"${g.message(code:'queuekit.adminButton.LA')}",
-            "${ChangeConfigBean.LIMITUSERBELOW}":"${g.message(code:'queuekit.adminButton.LB')}",
-            "${ChangeConfigBean.FLOODCONTROL}":"${g.message(code:'queuekit.adminButton.FC')}",
-            "${ChangeConfigBean.DEFAULTCOMPARATOR}":"${g.message(code:'queuekit.adminButton.DC')}"
+	var adminMessages = {"${QueuekitLists.POOL}":"${g.message(code:'queuekit.adminButton.PO')}",
+            "${QueuekitLists.PRESERVE}":"${g.message(code:'queuekit.adminButton.PR')}",
+            "${QueuekitLists.CHECKQUEUE}":"${g.message(code:'queuekit.adminButton.CQ')}",
+            "${QueuekitLists.STOPEXECUTOR}":"${g.message(code:'queuekit.adminButton.ST')}",
+            "${QueuekitLists.LIMITUSERABOVE}":"${g.message(code:'queuekit.adminButton.LA')}",
+            "${QueuekitLists.LIMITUSERBELOW}":"${g.message(code:'queuekit.adminButton.LB')}",
+            "${QueuekitLists.FLOODCONTROL}":"${g.message(code:'queuekit.adminButton.FC')}",
+            "${QueuekitLists.DEFAULTCOMPARATOR}":"${g.message(code:'queuekit.adminButton.DC')}"
             
 	}
 	$('#adminButtons').on('change', function() {

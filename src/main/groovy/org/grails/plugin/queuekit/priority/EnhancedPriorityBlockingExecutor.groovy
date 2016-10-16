@@ -1,20 +1,10 @@
 package org.grails.plugin.queuekit.priority
 
 import grails.util.Holders
-
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.PriorityBlockingQueue
-import java.util.concurrent.RunnableFuture
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
-
 import org.grails.plugin.queuekit.QueuekitHelper
 import org.grails.plugin.queuekit.ReportsQueue
+
+import java.util.concurrent.*
 
 /**
  * Customised ThreadExecutor extended class
@@ -56,7 +46,9 @@ class EnhancedPriorityBlockingExecutor extends ThreadPoolExecutor {
 	/*
 	 * Set the size of your corePoolSize this is your core/max size defined in one
 	 */
-	private static int maximumPoolSize = Holders.grailsApplication.config.queuekit?.maximumPoolSize ?: 3
+	private static final int actualPoolSize = Holders.grailsApplication.config.queuekit?.maximumPoolSize ?: 3
+	private static int maximumPoolSize = actualPoolSize
+
 
 	private static int maxQueue = Holders.grailsApplication.config.queuekit.maxQueue?:100
 
@@ -331,14 +323,14 @@ class EnhancedPriorityBlockingExecutor extends ThreadPoolExecutor {
 	public void  execute(Runnable command) {
 		boolean slotsFree
 		if (!defaultComparator) {
-			slotsFree=QueuekitHelper.changeMaxPoolSize(this,command.queue.userId,maximumPoolSize,minPreserve,0,definedPriority.value,
+			slotsFree=QueuekitHelper.changeMaxPoolSize(this,command.queue.userId,actualPoolSize,minPreserve,command.queue?.priority?.value ?: 0,definedPriority.value,
 					super.getActiveCount(),super.getCorePoolSize())
 		}
 		ScheduledThreadPoolExecutor timeoutExecutor= new ScheduledThreadPoolExecutor(1)
 		timeoutExecutor.setRemoveOnCancelPolicy(true)
 
 		CompareFutureTask task = new CompareFutureTask(command,null,this,timeoutExecutor,definedPriority.value,
-				maximumPoolSize, minPreserve,slotsFree)
+				actualPoolSize, minPreserve,slotsFree)
 
 		super.execute(task)
 	}

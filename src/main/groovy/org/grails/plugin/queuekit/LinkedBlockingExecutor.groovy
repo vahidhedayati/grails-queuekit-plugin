@@ -1,14 +1,13 @@
 package org.grails.plugin.queuekit
 
 import grails.util.Holders
+import org.grails.plugin.queuekit.priority.ComparableFutureTask
+import org.grails.plugin.queuekit.priority.EnhancedRejectedExecutionHandler
 
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
-
-import org.grails.plugin.queuekit.priority.ComparableFutureTask
-import org.grails.plugin.queuekit.priority.EnhancedRejectedExecutionHandler
 
 /**
  * 

@@ -2,7 +2,6 @@
 
 package org.grails.plugin.queuekit.reports
 
-import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.core.support.GrailsApplicationAware
 import groovy.time.TimeCategory
@@ -12,8 +11,8 @@ import org.grails.plugin.queuekit.priority.ComparableFutureTask
 import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.Priority
 import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
-import org.grails.plugin.queuekit.validation.ChangeConfigBean
 import org.grails.plugin.queuekit.validation.QueueKitBean
+import org.grails.plugin.queuekit.validation.QueuekitLists
 import org.grails.plugin.queuekit.validation.ReportsQueueBean
 
 import java.util.concurrent.RunnableFuture
@@ -177,23 +176,23 @@ class QueueReportService implements GrailsApplicationAware {
 		switch (queueLabel) {
 			case ReportsQueue.LINKEDBLOCKING:
 				LinkedBlockingExecutor ex = new LinkedBlockingExecutor()
-				if (changeType == ChangeConfigBean.POOL) {
+				if (changeType == QueuekitLists.POOL) {
 					ex.maximumPoolSize=changeValue
-				} else if (changeType == ChangeConfigBean.MAXQUEUE) {
+				} else if (changeType == QueuekitLists.MAXQUEUE) {
 					ex.maxQueue=changeValue
-				} else if (changeType == ChangeConfigBean.CHECKQUEUE) {
+				} else if (changeType == QueuekitLists.CHECKQUEUE) {
 					queuekitExecutorBaseService.checkQueue(LinkedBlockingReportsQueue.class)
-				} else if (changeType == ChangeConfigBean.STOPEXECUTOR) {
+				} else if (changeType == QueuekitLists.STOPEXECUTOR) {
 					linkedBlockingExecutor.shutdown()
 				}
 				break
 			case ReportsQueue.ARRAYBLOCKING:
 				ArrayBlockingExecutor ex = new ArrayBlockingExecutor()
-				if (changeType == ChangeConfigBean.POOL) {
+				if (changeType == QueuekitLists.POOL) {
 					ex.maximumPoolSize=changeValue
-				} else if (changeType == ChangeConfigBean.MAXQUEUE) {
+				} else if (changeType == QueuekitLists.MAXQUEUE) {
 					ex.maxQueue=changeValue
-				} else if (changeType == ChangeConfigBean.CHECKQUEUE) {
+				} else if (changeType == QueuekitLists.CHECKQUEUE) {
 					queuekitExecutorBaseService.checkQueue(ArrayBlockingReportsQueue.class)
 				}
 				break
@@ -210,35 +209,35 @@ class QueueReportService implements GrailsApplicationAware {
 
 	private void actionModifyType(String changeType,int changeValue,Priority priority=Priority.MEDIUM,int floodControl,ex,executor,boolean defaultComparator) {
 		switch (changeType) {
-			case ChangeConfigBean.POOL:
+			case QueuekitLists.POOL:
 				ex.maximumPoolSize=changeValue
 				break
-			case ChangeConfigBean.MAXQUEUE:
+			case QueuekitLists.MAXQUEUE:
 				ex.maxQueue=changeValue
-			case ChangeConfigBean.PRESERVE:
+			case QueuekitLists.PRESERVE:
 				if (changeValue < ex.maximumPoolSize) {
 					ex.minPreserve=changeValue
 					ex.definedPriority=priority
 				}
 				break
-			case ChangeConfigBean.CHECKQUEUE:
-				if (changeType == ChangeConfigBean.CHECKQUEUE) {
+			case QueuekitLists.CHECKQUEUE:
+				if (changeType == QueuekitLists.CHECKQUEUE) {
 					queuekitExecutorBaseService.checkQueue(ex.class)
 				}
 				break
-			case ChangeConfigBean.STOPEXECUTOR:
+			case QueuekitLists.STOPEXECUTOR:
 				executor.shutdown()
 				break
-			case ChangeConfigBean.DEFAULTCOMPARATOR:
+			case QueuekitLists.DEFAULTCOMPARATOR:
 				ex.defaultComparator=defaultComparator
 				break
-			case ChangeConfigBean.LIMITUSERABOVE:
+			case QueuekitLists.LIMITUSERABOVE:
 				ex.limitUserAbovePriority=changeValue
 				break
-			case ChangeConfigBean.LIMITUSERBELOW:
+			case QueuekitLists.LIMITUSERBELOW:
 				ex.limitUserBelowPriority=changeValue
 				break
-			case ChangeConfigBean.FLOODCONTROL:
+			case QueuekitLists.FLOODCONTROL:
 				ex.forceFloodControl=floodControl
 				break
 		}
@@ -451,17 +450,11 @@ class QueueReportService implements GrailsApplicationAware {
 	)
 	from ReportsQueue rq  """
 
-		if (bean.superUser && bean.userSearchId) {
-			where=addClause(where,'rq.userId=:userSearchId')
-			whereParams.userSearchId=bean.userSearchId
-		} else {
-			if (!bean.superUser || (bean.superUser && bean.status != ReportsQueue.OTHERUSERS)) {
-				where=addClause(where,'rq.userId=:userId')
-				whereParams.userId=bean.userId
-			}
+		if (!bean.superUser || (bean.superUser && (bean.status != ReportsQueue.OTHERUSERS||bean.searchBy && bean.searchBy!=QueuekitLists.USER))) {
+			where=addClause(where,'rq.userId=:userId')
+			whereParams.userId=bean.userId
 		}
 		if (!bean.superUser && bean.status!=ReportsQueue.DOWNLOADED ||bean.superUser && (bean.status!=ReportsQueue.DELETED||bean.status!=ReportsQueue.DOWNLOADED)) {
-
 			where=addClause(where,'rq.status not in (:statuses) ')
 			def statuses=[]
 
@@ -479,9 +472,18 @@ class QueueReportService implements GrailsApplicationAware {
 			whereParams.status=bean.status
 		}
 
-		if (bean.searchBy==QueueKitBean.REPORTNAME) {
-			where=addClause(where,'rq.reportName like :reportSearch')
-			whereParams.reportSearch='%'+bean.searchFor+'%'
+		if (bean.searchBy) {
+			if (bean.searchBy==QueuekitLists.REPORTNAME) {
+				where=addClause(where,'rq.reportName like :reportSearch')
+				whereParams.reportSearch='%'+bean.searchFor+'%'
+			} else if (bean.searchBy==QueuekitLists.USER && bean.superUser) {
+				Long userId = queuekitUserService.getRealUserId(bean.searchFor)
+				if (userId) {
+					where=addClause(where,'rq.userId=:userId')
+					whereParams.userId=userId
+				}
+			}
+
 		}
 		query+=where
 		def metaParams=[readOnly:true,timeout:15,offset:bean.offset?:0,max:bean.max?:-1]
@@ -543,8 +545,8 @@ class QueueReportService implements GrailsApplicationAware {
 		}
 		instanceList << [reportJobs:queueTypes]
 
-		return [instanceList:instanceList,instanceTotal:total, superUser:bean.superUser,statuses:bean.statuses,
-				searchList:bean.searchList, deleteList:bean.deleteList, adminButtons:bean.adminButtons]
+		return [instanceList:instanceList, instanceTotal:total, superUser:bean.superUser, statuses:bean.statuses,
+				searchList  :bean.searchList, deleteList:QueuekitLists.deleteList, adminButtons:bean.adminButtons]
 	}
 
 	/**

@@ -1,4 +1,4 @@
-<%@ page import="org.grails.plugin.queuekit.priority.Priority;org.grails.plugin.queuekit.ReportsQueue;org.grails.plugin.queuekit.validation.ChangeConfigBean" %>
+<%@ page import="org.grails.plugin.queuekit.validation.QueuekitLists; org.grails.plugin.queuekit.priority.Priority;org.grails.plugin.queuekit.ReportsQueue;org.grails.plugin.queuekit.validation.ChangeConfigBean" %>
 <div id="error">
 </div>
 <form id="changeConfigForm">
@@ -61,13 +61,13 @@
 		<a class="btn btn-danger" style="display:none" id="closeForm" onclick="closeModal()"><g:message code="queuekit.close.label"/></a>
 	</div>
 <form>
-<g:if test="${instance.changeType==ChangeConfigBean.MAXQUEUE}">
+<g:if test="${instance.changeType==QueuekitLists.MAXQUEUE}">
 <g:message code="queuekit.maxQueue1.message"/>
 </g:if>
-<g:if test="${instance.changeType==ChangeConfigBean.POOL}">
+<g:if test="${instance.changeType==QueuekitLists.POOL}">
 <g:message code="queuekit.maxPool1.message"/>
 </g:if>
-<g:if test="${instance.changeType==ChangeConfigBean.CHECKQUEUE}">
+<g:if test="${instance.changeType==QueuekitLists.CHECKQUEUE}">
 <g:message code="queuekit.checkQueue1.message"/>
 <g:message code="queuekit.checkQueue2.message"/>
 <g:message code="queuekit.checkQueue3.message"/>
@@ -78,7 +78,7 @@
 <g:message code="queuekit.checkQueue8.message"/>
 </g:if>
 
-<g:if test="${instance.changeType==ChangeConfigBean.STOPEXECUTOR}">
+<g:if test="${instance.changeType==QueuekitLists.STOPEXECUTOR}">
 <g:message code="queuekit.stopExecutor1.message"/>
 <g:message code="queuekit.stopExecutor2.message"/>
 <g:message code="queuekit.stopExecutor3.message"/><br/>
@@ -86,13 +86,13 @@
 <g:message code="queuekit.stopExecutor5.message"/>
 <g:message code="queuekit.stopExecutor6.message"/>
 </g:if>
-<g:if test="${instance.changeType==ChangeConfigBean.LIMITUSERABOVE||instance.changeType==ChangeConfigBean.LIMITUSERBELOW}">
+<g:if test="${instance.changeType==QueuekitLists.LIMITUSERABOVE||instance.changeType==QueuekitLists.LIMITUSERBELOW}">
 <g:message code="queuekit.limitUser1.message"/>
 </g:if>
-<g:if test="${instance.changeType==ChangeConfigBean.FLOODCONTROL}">
+<g:if test="${instance.changeType==QueuekitLists.FLOODCONTROL}">
 <g:message code="queuekit.floodControl1.message"/>
 </g:if>
-<g:if test="${instance.changeType==ChangeConfigBean.DEFAULTCOMPARATOR}">
+<g:if test="${instance.changeType==QueuekitLists.DEFAULTCOMPARATOR}">
 <g:message code="queuekit.defaultComparator1.message"/>
 </g:if>
 
@@ -120,14 +120,14 @@ $(function() {
 })
 function configureFields(queueType) {
 	var changeType="${instance.changeType}";
-	var isPool = changeType=='${ChangeConfigBean.POOL}';
-	var isQueue = changeType=='${ChangeConfigBean.MAXQUEUE}';
-	var isPreserve = changeType=='${ChangeConfigBean.PRESERVE}';
-	var isConfig = changeType=='${ChangeConfigBean.PRESERVE}';
-	var isLimit = changeType=='${ChangeConfigBean.LIMITUSERABOVE}'||changeType=='${ChangeConfigBean.LIMITUSERBELOW}';
-	var isQueueCheck = changeType=='${ChangeConfigBean.CHECKQUEUE}';
-	var isFlood = changeType=='${ChangeConfigBean.FLOODCONTROL}';
-	var isDefaultComparator = changeType=='${ChangeConfigBean.DEFAULTCOMPARATOR}';
+	var isPool = changeType=='${QueuekitLists.POOL}';
+	var isQueue = changeType=='${QueuekitLists.MAXQUEUE}';
+	var isPreserve = changeType=='${QueuekitLists.PRESERVE}';
+	var isConfig = changeType=='${QueuekitLists.PRESERVE}';
+	var isLimit = changeType=='${QueuekitLists.LIMITUSERABOVE}'||changeType=='${QueuekitLists.LIMITUSERBELOW}';
+	var isQueueCheck = changeType=='${QueuekitLists.CHECKQUEUE}';
+	var isFlood = changeType=='${QueuekitLists.FLOODCONTROL}';
+	var isDefaultComparator = changeType=='${QueuekitLists.DEFAULTCOMPARATOR}';
 	if (isConfig||isLimit||isPool||isQueue) {
 		if ((queueType=='${ReportsQueue.LINKEDBLOCKING}'||queueType=='${ReportsQueue.ARRAYBLOCKING}') && (isConfig||isLimit)) {			 
 			hideButtons();

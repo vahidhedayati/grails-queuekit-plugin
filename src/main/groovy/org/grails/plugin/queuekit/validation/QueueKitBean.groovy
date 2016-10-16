@@ -2,20 +2,12 @@ package org.grails.plugin.queuekit.validation
 
 import grails.util.Holders
 import grails.validation.Validateable
-
 import org.grails.plugin.queuekit.ReportsQueue
-
 
 class QueueKitBean implements Validateable {
 
 	def queuekitUserService = Holders.grailsApplication.mainContext.getBean('queuekitUserService')
 
-	static final String USER='US'
-	static final String REPORTNAME='RN'
-	static final List SEARCH_TYPES=[USER,REPORTNAME]
-
-	static final String DELALL='AL'
-	static final List deleteList = ReportsQueue.REPORT_STATUS_ALL-[ReportsQueue.DELETED,ReportsQueue.RUNNING,ReportsQueue.OTHERUSERS]+[DELALL]
 
 	Long userId
 
@@ -41,8 +33,8 @@ class QueueKitBean implements Validateable {
 		status (inList:ReportsQueue.REPORT_STATUS_ALL)
 		userSearchId(nullable:true)
 		searchFor(nullable:true)
-		searchBy(inList:SEARCH_TYPES)
-		deleteBy(nullable:true, inList:deleteList)
+		searchBy(inList:QueuekitLists.SEARCH_TYPES)
+		deleteBy(nullable:true, inList:QueuekitLists.deleteList)
 	}
 
 	/**
@@ -61,7 +53,7 @@ class QueueKitBean implements Validateable {
 	 * @return
 	 */
 	List getSearchList() {
-		return (getSuperUser() ? SEARCH_TYPES: SEARCH_TYPES-[USER])
+		return (getSuperUser() ? QueuekitLists.SEARCH_TYPES: QueuekitLists.SEARCH_TYPES-[QueuekitLists.USER])
 	}
 
 	/**
@@ -73,7 +65,7 @@ class QueueKitBean implements Validateable {
 	}
 	
 	List getAdminButtons() {
-		return (getSuperUser() ? ChangeConfigBean.CHANGE_TYPES : [])
+		return (getSuperUser() ? QueuekitLists.CHANGE_TYPES : [])
 	}
 	/**
 	 * When the user searches for a username on the front end listing
@@ -90,7 +82,7 @@ class QueueKitBean implements Validateable {
 	 * @return
 	 */
 	Long getUserSearchId() {
-		if (searchFor==USER && superUser) {
+		if (searchFor==QueuekitLists.USER && superUser) {
 			return queuekitUserService.getRealUserId(searchBy)
 		}
 		return null

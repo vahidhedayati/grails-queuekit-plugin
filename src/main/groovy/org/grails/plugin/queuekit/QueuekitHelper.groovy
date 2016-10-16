@@ -1,12 +1,11 @@
 package org.grails.plugin.queuekit
 
 import grails.util.Holders
-
-import java.util.concurrent.PriorityBlockingQueue
-
 import org.grails.plugin.queuekit.priority.ComparableFutureTask
 import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.Priority
+
+import java.util.concurrent.PriorityBlockingQueue
 
 /**
  * 
@@ -14,6 +13,7 @@ import org.grails.plugin.queuekit.priority.Priority
  * @author Vahid Hedayati
  *
  */
+
 class QueuekitHelper {
 	/**
 	 * Retrieve configuration value of reportPriorties 
@@ -135,8 +135,10 @@ class QueuekitHelper {
 		}
 
 		int runSize = slotsFree ? poolSize : minSize
-		executor.setCorePoolSize(runSize)
-		executor.setMaximumPoolSize(runSize)
+		if (runSize && executor) {
+			executor.setCorePoolSize(runSize)
+			executor.setMaximumPoolSize(runSize)
+		}
 		return slotsFree
 	}
 
