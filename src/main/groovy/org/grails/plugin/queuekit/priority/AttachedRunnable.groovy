@@ -59,12 +59,13 @@ class AttachedRunnable implements Runnable {
 				 * 
 				 */
 				if (t.isInterrupted()||shutdown||!t.isAlive()) {
-					t.interrupt()
-					t.stop()
 					break
 				}
 			}
-
+			if (shutdown) {
+				t.interrupt()
+				t.stop()
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace()
 			t.interrupt()

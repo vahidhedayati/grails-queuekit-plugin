@@ -22,7 +22,7 @@ queuekit
 
 ### Grails 3: 
 ```groovy
-compile "org.grails.plugins:queuekit:1.3"
+compile "org.grails.plugins:queuekit:1.4"
 ```
  
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/) | [demo](https://github.com/vahidhedayati/test-queuekit3/) 
@@ -39,7 +39,13 @@ compile ":queuekit:1.0"
 The configuration provided would be added to Config.groovy on grails 2 and application.groovy in grails 3.
 
 
-### [Video 1: Walk through grails 3](https://www.youtube.com/watch?v=JXjZctS92Sc) | [Video 2: Grails 2 stopping running task walk through](https://www.youtube.com/watch?v=sS4JL97ex74)
+####Videos
+##### [Video 1:- grails queuekit plugin part 1 : Why you would use this plugin?](https://www.youtube.com/watch?v=hVC8IOagAwo)
+##### [Video 2:- grails queuekit plugin part 2 : Configuration walkthrough](https://www.youtube.com/watch?v=JgoSSOG_iRI)
+##### [Video 3:- grails queuekit plugin part 3 : Demonstrating cancellation of live threadExecutor Threads](https://www.youtube.com/watch?v=QDZ5-A-4_8o)
+##### [Video 4:- grails queuekit plugin part 4 : Binding plugin with your grails application security](https://www.youtube.com/watch?v=6MOzoPp7o1g)
+##### [Video 5:- grails queuekit plugin  part 5: Preserving a running queue slot for defined priority or above](https://www.youtube.com/watch?v=ACKo7o6DkkA)
+#### [Video Boxset (all of above)](https://www.youtube.com/watch?v=hVC8IOagAwo&list=PLfZr1vB6p8XIHP-d8ta8fyYVCgRfr4Y7h)
 
 ## 3.Information
 =====
