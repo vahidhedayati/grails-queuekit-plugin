@@ -56,7 +56,8 @@ class EnhancedPriorityBlockingExecutor extends ThreadPoolExecutor {
 	/*
 	 * Set the size of your corePoolSize this is your core/max size defined in one
 	 */
-	private static int maximumPoolSize = Holders.grailsApplication.config.queuekit?.maximumPoolSize ?: 3
+	private static final int actualPoolSize = Holders.grailsApplication.config.queuekit?.maximumPoolSize ?: 3
+	private static int maximumPoolSize = actualPoolSize
 
 	private static int maxQueue = Holders.grailsApplication.config.queuekit.maxQueue?:100
 
@@ -331,14 +332,14 @@ class EnhancedPriorityBlockingExecutor extends ThreadPoolExecutor {
 	public void  execute(Runnable command) {
 		boolean slotsFree
 		if (!defaultComparator) {
-			slotsFree=QueuekitHelper.changeMaxPoolSize(this,command.queue.userId,maximumPoolSize,minPreserve,0,definedPriority.value,
+			slotsFree=QueuekitHelper.changeMaxPoolSize(this,command.queue.userId,actualPoolSize,minPreserve,command.queue?.priority?.value ?: 0,definedPriority.value,
 					super.getActiveCount(),super.getCorePoolSize())
 		}
 		ScheduledThreadPoolExecutor timeoutExecutor= new ScheduledThreadPoolExecutor(1)
 		timeoutExecutor.setRemoveOnCancelPolicy(true)
 
 		CompareFutureTask task = new CompareFutureTask(command,null,this,timeoutExecutor,definedPriority.value,
-				maximumPoolSize, minPreserve,slotsFree)
+				actualPoolSize, minPreserve,slotsFree)
 
 		super.execute(task)
 	}

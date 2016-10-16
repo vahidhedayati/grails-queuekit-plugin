@@ -34,7 +34,8 @@ class PriorityBlockingExecutor extends ThreadPoolExecutor {
 	/*
 	 * Set the size of your corePoolSize this is your core/max size defined in one
 	 */
-	private static int maximumPoolSize = Holders.grailsApplication.config.queuekit?.maximumPoolSize ?: 3
+	private static final int actualPoolSize = Holders.grailsApplication.config.queuekit?.maximumPoolSize ?: 3
+	private static int maximumPoolSize = actualPoolSize
 
 	private static int maxQueue = Holders.grailsApplication.config.queuekit.maxQueue?:100
 	/*
@@ -165,11 +166,11 @@ class PriorityBlockingExecutor extends ThreadPoolExecutor {
 
 		boolean slotsFree
 		if (!defaultComparator) {
-			slotsFree=QueuekitHelper.changeMaxPoolSize(this,command.queue.userId,maximumPoolSize,minPreserve,priority,definedPriority.value,
+			slotsFree=QueuekitHelper.changeMaxPoolSize(this,command.queue.userId,actualPoolSize,minPreserve,priority,definedPriority.value,
 					super.getActiveCount(),super.getCorePoolSize())
 		}
 
-		ComparableFutureTask task = new ComparableFutureTask(command,null,this,priority,definedPriority.value, maximumPoolSize, minPreserve,slotsFree)
+		ComparableFutureTask task = new ComparableFutureTask(command,null,this,priority,definedPriority.value, actualPoolSize, minPreserve,slotsFree)
 
 		super.execute(task)
 	}

@@ -10,19 +10,13 @@ class QueueKitBean {
 
 	def queuekitUserService = Holders.grailsApplication.mainContext.getBean('queuekitUserService')
 
-	static final String USER='US'
-	static final String REPORTNAME='RN'
-	static final List SEARCH_TYPES=[USER,REPORTNAME]
-
-	static final String DELALL='AL'
-	static final List deleteList = ReportsQueue.REPORT_STATUS_ALL-[ReportsQueue.DELETED,ReportsQueue.RUNNING,ReportsQueue.OTHERUSERS]+[DELALL]
 
 	Long userId
 
 	String searchBy
 	String searchFor
 	Long userSearchId
-	
+
 	String status
 
 	Integer max=Math.min(10, 50)
@@ -41,8 +35,8 @@ class QueueKitBean {
 		status (inList:ReportsQueue.REPORT_STATUS_ALL)
 		userSearchId(nullable:true)
 		searchFor(nullable:true)
-		searchBy(inList:SEARCH_TYPES)		
-		deleteBy(nullable:true, inList:deleteList)
+		searchBy(inList:QueuekitLists.SEARCH_TYPES)
+		deleteBy(nullable:true, inList:QueuekitLists.deleteList)
 	}
 
 	/**
@@ -56,12 +50,12 @@ class QueueKitBean {
 	}
 
 	/**
-	 * returns correct search select listing 
+	 * returns correct search select listing
 	 * based on privileges
 	 * @return
 	 */
 	List getSearchList() {
-		return (getSuperUser() ? SEARCH_TYPES: SEARCH_TYPES-[USER])
+		return (getSuperUser() ? QueuekitLists.SEARCH_TYPES: QueuekitLists.SEARCH_TYPES-[QueuekitLists.USER])
 	}
 
 	/**
@@ -73,24 +67,24 @@ class QueueKitBean {
 	}
 
 	List getAdminButtons() {
-		return (getSuperUser() ? ChangeConfigBean.CHANGE_TYPES : [])
+		return (getSuperUser() ? QueuekitLists.CHANGE_TYPES : [])
 	}
 	/**
 	 * When the user searches for a username on the front end listing
 	 * Since this plugin has been designed without the awareness of how you run your userbase.
 	 * It calls on queuekitUserService.getRealUserId(searchBy) which will return a userId bound
-	 * to search username. 
-	 * 
+	 * to search username.
+	 *
 	 * At the moment provided service returns 1 the same as currentuser which is also 1
-	 * 
-	 * The only thing you need to override is queuekitUserService and make your own then using 
+	 *
+	 * The only thing you need to override is queuekitUserService and make your own then using
 	 * resources.groovy bind it back to be actually queuekitUserService so plugin uses your version instead
 	 * to return a real userid
-	 * 
+	 *
 	 * @return
 	 */
 	Long getUserSearchId() {
-		if (searchFor==USER && superUser) {
+		if (searchFor==QueuekitLists.USER && superUser) {
 			return queuekitUserService.getRealUserId(searchBy)
 		}
 		return null
@@ -107,7 +101,7 @@ class QueueKitBean {
 			userSearchId:userSearchId,
 			status:status,
 			sort:sort,
-			offset:offset,			
+			offset:offset,
 			position:position,
 			order:order,
 			jobControl:jobControl,
@@ -125,7 +119,7 @@ class QueueKitBean {
 	}
 
 	/**
-	 * form max  
+	 * form max
 	 * @param o
 	 */
 	void setMax(Integer o) {

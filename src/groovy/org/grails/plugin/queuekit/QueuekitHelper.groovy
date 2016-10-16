@@ -135,8 +135,10 @@ class QueuekitHelper {
 		}
 
 		int runSize = slotsFree ? poolSize : minSize
-		executor.setCorePoolSize(runSize)
-		executor.setMaximumPoolSize(runSize)
+		if (runSize && executor) {
+			executor.setCorePoolSize(runSize)
+			executor.setMaximumPoolSize(runSize)
+		}
 		return slotsFree
 	}
 

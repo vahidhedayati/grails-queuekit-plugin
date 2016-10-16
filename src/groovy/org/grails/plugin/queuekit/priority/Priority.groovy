@@ -1,5 +1,8 @@
 package org.grails.plugin.queuekit.priority
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 public enum Priority {
 
 	HIGHEST(0),

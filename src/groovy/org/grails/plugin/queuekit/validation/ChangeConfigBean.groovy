@@ -20,18 +20,6 @@ import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
 @Validateable
 class ChangeConfigBean extends ChangePriorityBean {
 
-	static final String POOL='PO'
-	static final String PRESERVE='PR'
-	static final String CHECKQUEUE='CQ'
-	static final String STOPEXECUTOR='ST'
-	static final String FLOODCONTROL='FC'
-	static final String LIMITUSERABOVE='LA'
-	static final String LIMITUSERBELOW='LB'
-	static final String DEFAULTCOMPARATOR='DC'
-	static final String MAXQUEUE='MQ'
-	static final List CHANGE_TYPES=[POOL,MAXQUEUE,PRESERVE,DEFAULTCOMPARATOR,FLOODCONTROL,LIMITUSERABOVE,LIMITUSERBELOW,CHECKQUEUE,STOPEXECUTOR]
-
-
 	int changeValue
 	String changeType
 	String queueType
@@ -43,7 +31,7 @@ class ChangeConfigBean extends ChangePriorityBean {
 
 	static constraints = {
 		queue(nullable:true, validator: checkQueueType)
-		changeType(inList:CHANGE_TYPES)
+		changeType(inList:QueuekitLists.CHANGE_TYPES)
 		changeValue(validator: checkValue ) //nullable:true,blank:true,
 		queueType(nullable:true,inList:ReportsQueue.REPORT_TYPES)
 		floodControl(nullable:true)
@@ -61,23 +49,23 @@ class ChangeConfigBean extends ChangePriorityBean {
 
 	List getQueueList() {
 		switch (changeType) {
-			case STOPEXECUTOR:
+			case QueuekitLists.STOPEXECUTOR:
 				ReportsQueue.REPORT_TYPES-[ReportsQueue.ARRAYBLOCKING]
 				break
-			case MAXQUEUE:
+			case QueuekitLists.POOL:
 				ReportsQueue.REPORT_TYPES
 				break
-			case POOL:
+			case QueuekitLists.MAXQUEUE:
 				ReportsQueue.REPORT_TYPES
 				break
-			case CHECKQUEUE:
+			case QueuekitLists.CHECKQUEUE:
 				ReportsQueue.REPORT_TYPES
 				break
-			case PRESERVE:
-			case LIMITUSERABOVE:
-			case LIMITUSERBELOW:
-			case DEFAULTCOMPARATOR:
-			case FLOODCONTROL:
+			case QueuekitLists.PRESERVE:
+			case QueuekitLists.LIMITUSERABOVE:
+			case QueuekitLists.LIMITUSERBELOW:
+			case QueuekitLists.DEFAULTCOMPARATOR:
+			case QueuekitLists.FLOODCONTROL:
 			default:
 				ReportsQueue.REPORT_TYPES-[ReportsQueue.ARRAYBLOCKING,ReportsQueue.LINKEDBLOCKING]
 				break
@@ -111,13 +99,13 @@ class ChangeConfigBean extends ChangePriorityBean {
 			case ReportsQueue.LINKEDBLOCKING:
 				results=formatAdvanced(changeType,results,LinkedBlockingExecutor)
 				break
-			case ReportsQueue.ARRAYBLOCKING:				
-				results=formatAdvanced(changeType,results,ArrayBlockingExecutor)				
+			case ReportsQueue.ARRAYBLOCKING:
+				results=formatAdvanced(changeType,results,ArrayBlockingExecutor)
 				break
-			case ReportsQueue.PRIORITYBLOCKING:				
+			case ReportsQueue.PRIORITYBLOCKING:
 				results=formatAdvanced(changeType,results,PriorityBlockingExecutor)
 				break
-			case ReportsQueue.ENHANCEDPRIORITYBLOCKING:				
+			case ReportsQueue.ENHANCEDPRIORITYBLOCKING:
 				results=formatAdvanced(changeType,results,EnhancedPriorityBlockingExecutor)
 				break
 		}
@@ -126,21 +114,21 @@ class ChangeConfigBean extends ChangePriorityBean {
 
 	private Map formatAdvanced(String changeType,Map results, Class executor) {
 		switch (changeType) {
-			case POOL:
+			case QueuekitLists.POOL:
 				results.value = executor?.maximumPoolSize
 				break
-			case MAXQUEUE:
+			case QueuekitLists.MAXQUEUE:
 				results.value = executor?.maxQueue
 				break
-			case LIMITUSERABOVE:
+			case QueuekitLists.LIMITUSERABOVE:
 				results.value = executor?.limitUserAbovePriority
 				break
-			case LIMITUSERBELOW:
+			case QueuekitLists.LIMITUSERBELOW:
 				results.value = executor?.limitUserBelowPriority
 				break
-			case FLOODCONTROL:
+			case QueuekitLists.FLOODCONTROL:
 				results.floodControl= executor?.forceFloodControl
-			case DEFAULTCOMPARATOR:
+			case QueuekitLists.DEFAULTCOMPARATOR:
 				results.defaultComparator= executor?.defaultComparator
 				break
 			default:
@@ -151,10 +139,9 @@ class ChangeConfigBean extends ChangePriorityBean {
 		return results
 	}
 
-	static def checkValue= {val, obj, errors ->
-		if (val && val<0 && obj.changeType != CHECKQUEUE) {
+	static def checkValue= { val, obj, errors ->
+		if (val && val < 0 && obj.changeType != CHECKQUEUE) {
 			errors.rejectValue(propertyName, "queuekit.invalidConfigValue.error")
 		}
 	}
-
 }

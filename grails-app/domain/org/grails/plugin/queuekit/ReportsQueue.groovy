@@ -1,5 +1,6 @@
 package org.grails.plugin.queuekit
 
+import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 
 import org.grails.plugin.queuekit.priority.Priority
@@ -12,6 +13,7 @@ import org.grails.plugin.queuekit.priority.Priority
  * @author Vahid Hedayati
  *
  */
+@GrailsCompileStatic
 class ReportsQueue {
 
 	String reportName		//typical report will use reportName
@@ -110,7 +112,7 @@ class ReportsQueue {
 		return false
 	}
 	
-	Map getParamsAsMap() {
+	def getParamsAsMap() {
 		return JSON.parse(paramsMap)
 	}
 }
