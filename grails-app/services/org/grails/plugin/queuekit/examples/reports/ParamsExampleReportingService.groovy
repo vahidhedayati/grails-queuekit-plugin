@@ -1,9 +1,7 @@
 package org.grails.plugin.queuekit.examples.reports
 
-import java.util.Map;
-
 import org.grails.plugin.queuekit.ReportsQueue
-import org.grails.plugin.queuekit.priority.Priority;
+import org.grails.plugin.queuekit.priority.Priority
 import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 
 
@@ -11,11 +9,6 @@ class ParamsExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
 
-	Priority getQueuePriority(ReportsQueue queue, Map params) {
-		Priority priority = queue.priority ?: queue.defaultPriority		
-		return priority
-	}
-	
 	def runReport(ReportsQueue queue,Map params) {
 		def queryResults = tsvService.runParams(params)
 		runReport(queue,queryResults,params)

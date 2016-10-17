@@ -11,31 +11,6 @@ class CsvExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
 
-	/**
-	 * This must exist
-	 */
-	Priority getQueuePriority(ReportsQueue queue, Map params) {
-		Priority priority = queue.priority ?: queue.defaultPriority
-		if (params.fromDate && params.toDate) {
-			Date toDate = parseDate(params.toDate)
-			Date fromDate = parseDate(params.fromDate)
-			int difference = toDate && fromDate ? (toDate - fromDate) : null
-			if (difference||difference==0) {
-				if (difference <= 1) {
-					// 1 day everything becomes HIGH priority
-					priority = Priority.HIGH
-				} else if  (difference >= 1 && difference <= 8) {
-					if (priority == Priority.HIGHEST) {
-						priority = Priority.HIGH
-					} else if (priority >= Priority.MEDIUM) {
-						priority = priority.value.previous()
-					}
-				}
-			}
-		}
-		return priority
-	}
-
 	/*
 	 * We must define the report type file extension
 	 * default is tsv this being CSV needs to be defined
