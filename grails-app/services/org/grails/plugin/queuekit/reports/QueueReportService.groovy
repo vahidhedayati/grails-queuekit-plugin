@@ -435,8 +435,8 @@ class QueueReportService {
 		def query
 		def where=''
 		def whereParams=[:]
-		def sorts=['reportName', 'created', 'startDate', 'finishDate' ,'user', 'status', 'priority','queueType','duration','userId']
-		def sorts2=['rq.reportName', 'rq.created', 'rq.start','rq.finished','rq.userId','rq.status', 'rq.priority','rq.class','rq.finished-rq.start','rq.userId']
+		def sorts=['reportName', 'created', 'startDate', 'finishDate' ,'user', 'status', 'priority','queueType','duration','initiation','userId']
+		def sorts2=['rq.reportName', 'rq.created', 'rq.start','rq.finished','rq.userId','rq.status', 'rq.priority','rq.class','rq.finished-rq.start','rq.created-rq.start','rq.userId']
 		def sortChoice=sorts.findIndexOf{it==bean.sort}
 
 		// FROM_UNIXTIME(UNIX_TIMESTAMP(coalesce(rq.finished,rq.start)) -  UNIX_TIMESTAMP(rq.start))
@@ -519,31 +519,17 @@ class QueueReportService {
 		def threshHold = durationThreshHold?.collect{[hours: it.hours?:0,minutes:it.minutes?:0,seconds:it.seconds?:0,color:it.color?:'']}
 
 		results=results?.each { instance ->
-			/*
-			 * If it is complete
-			 */
-			if (instance.finishDate) {
-				/*
-				 * Compare start/end
-				 */
-				TimeDuration duration = TimeCategory.minus(instance.finishDate, instance.startDate)
-				if (duration && threshHold) {
-					instance.duration=duration
-					/*
-					 * Find the nearest match from durationThreshHold
-					 */
-					def match = threshHold.findAll{ k-> k.hours <= duration.hours && \
-						k.minutes <= duration.minutes && k.seconds <= duration.seconds}\
-					.sort{a,b-> a.hours<=>b.hours ?: a?.minutes<=>b?.minutes?: a?.seconds<=>b?.seconds  }
-					if (match) {
-						instance.color=match.last().color
-					}
-				}
+			instance.duration=getDifference(instance?.startDate,instance?.finishDate)
+			if (instance.duration && threshHold) {
+				instance.color=returnColor(threshHold,instance.duration)
+			}
+			instance.initiation=getDifference(instance?.created,instance?.startDate)
+			if (instance.initiation && threshHold) {
+				instance.initiationColor=returnColor(threshHold,instance.initiation)
 			}
 			if (instance.queueType==ReportsQueue.PRIORITYBLOCKING||instance.queueType==ReportsQueue.ENHANCEDPRIORITYBLOCKING) {
 				instance.priority=instance.priority?:QueuekitHelper.sortPriority(instance.realReport)
 			}
-
 			instance.username = queuekitUserService.getUsername(instance.userId)
 		}
 		def instanceList=[results:results]
@@ -558,6 +544,26 @@ class QueueReportService {
 
 		return [instanceList:instanceList, instanceTotal:total, superUser:bean.superUser, statuses:bean.statuses,
 				searchList  :bean.searchList, deleteList:QueuekitLists.deleteList, adminButtons:bean.adminButtons]
+	}
+	
+	private TimeDuration getDifference(Date startDate,Date endDate) {
+		if (startDate && endDate) {
+			return TimeCategory.minus(endDate, startDate)
+		}
+	}
+	
+	private String returnColor(List threshHold,TimeDuration duration) {
+		String color=''
+		/*
+		 * Find the nearest match from durationThreshHold
+		 */
+		def match = threshHold.findAll{ k-> k.hours <= duration.hours && \
+			k.minutes <= duration.minutes && k.seconds <= duration.seconds}\
+		.sort{a,b-> a.hours<=>b.hours ?: a?.minutes<=>b?.minutes?: a?.seconds<=>b?.seconds  }
+		if (match) {
+			color=match.last().color
+		}
+		return color
 	}
 
 	/**
