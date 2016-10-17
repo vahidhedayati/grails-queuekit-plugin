@@ -3,7 +3,7 @@ package org.grails.plugin.queuekit.reports
 import grails.converters.JSON
 import grails.util.Holders
 
-import java.util.Map;
+import java.text.SimpleDateFormat
 import java.util.concurrent.RunnableFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
@@ -12,7 +12,6 @@ import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.grails.plugin.queuekit.ArrayBlockingReportsQueue
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.priority.AttachedRunnable
-import org.grails.plugin.queuekit.priority.ComparableFutureTask
 import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.Priority
 import org.hibernate.LazyInitializationException
@@ -67,8 +66,50 @@ abstract class QueuekitBaseReportsService  {
 	 */
 	abstract def runReport(ReportsQueue queue,Map params)
 
-	abstract Priority getQueuePriority(ReportsQueue queue,Map params)
+/**
+	 * getQueuePriority is by default the queue's configuration priority
+	 *
+	 *  Take a look at XlsExample where a more specific lookup is done
+	 * @param queue
+	 * @param params
+	 * @return
+	 */
+	Priority getQueuePriority(ReportsQueue queue, Map params) {
+		Priority priority = queue?.priority ?: queue.defaultPriority
+		return priority
+	}
 
+	/**
+	 * Take a look at XlsExample1ReportingService
+	 * It uses it to parse the Date fields given by 
+	 * end user. It will most likely be in String format 
+	 * and call the one below
+	 * @param t
+	 * @return
+	 */
+	Date parseDate(Date t,String format=null) {
+		return t
+	}
+
+	Date parseDate(String t,String format=null) {
+		SimpleDateFormat sf
+		if (!format) {
+			/*
+			 * Fix for No thread-bound request found: Are you referring to request attributes
+			 */
+			def webRequest = RequestContextHolder.getRequestAttributes()
+			if(!webRequest) {
+				def servletContext  = ServletContextHolder.getServletContext()
+				def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
+				webRequest = grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
+			}
+			format = new SimpleDateFormat(g.message(code:'queuekit.defaultDate.format', default: 'dd MMM yyyy'))
+		}
+		sf = new SimpleDateFormat(format)
+		sf.setLenient(false)
+		if (sf)	return sf.parse(t)
+	}
+	
 
 	/**
 	 * Abstract method must exist in all classes that extend this class
