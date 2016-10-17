@@ -39,6 +39,7 @@
 				<g:sortableColumn property="reportName" titleKey="queuekit.reportName.label" params="${search}" />
 				<g:sortableColumn property="created" titleKey="queuekit.created.label" params="${search}" />
 				<g:sortableColumn property="startDate" titleKey="queuekit.startDate.label" params="${search}" />
+				<g:sortableColumn property="initiation" titleKey="queuekit.initiation.label" params="${search}" />
 				<g:sortableColumn property="finishDate" titleKey="queuekit.finishDate.label" params="${search}" />
 				<g:sortableColumn property="duration" titleKey="queuekit.duration.label" params="${search}" />
 				<g:sortableColumn property="userId" titleKey="queuekit.username.label" params="${search}" />
@@ -60,6 +61,7 @@
 					<td>${reportInstance.reportName}</td>
 					<td><g:formatDate format="${dateFormat}" date="${reportInstance.created}"/></td>
 					<td><g:formatDate format="${dateFormat}" date="${reportInstance.startDate}"/></td>
+					<td style="background: ${reportInstance.initiationColor?:'transparent'}">${reportInstance.initiation?:''}</td>
 					<td><g:formatDate format="${dateFormat}" date="${reportInstance.finishDate}"/></td>
 					<td style="background: ${reportInstance.color?:'transparent'}">${reportInstance.duration?:''}</td>
 					<td>${reportInstance.username?:reportInstance.userId}</td>
