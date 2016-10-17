@@ -3,35 +3,11 @@ package org.grails.plugin.queuekit.examples.reports
 import grails.web.databinding.DataBindingUtils
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.examples.Report1Bean
-import org.grails.plugin.queuekit.priority.Priority
 import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
-
 
 class TsvExample1ReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
-
-	Priority getQueuePriority(ReportsQueue queue, Map params) {
-		Priority priority = queue.priority ?: queue.defaultPriority
-		if (params.fromDate && params.toDate) {
-			Date toDate = parseDate(params.toDate)
-			Date fromDate = parseDate(params.fromDate)
-			int difference = toDate && fromDate ? (toDate - fromDate) : null
-			if (difference||difference==0) {
-				if (difference <= 1) {
-					// 1 day everything becomes HIGH priority
-					priority = Priority.HIGH
-				} else if  (difference >= 1 && difference <= 8) {
-					if (priority == Priority.HIGHEST) {
-						priority = Priority.HIGH
-					} else if (priority >= Priority.MEDIUM) {
-						priority = priority.value.previous()
-					}
-				}
-			}
-		}
-		return priority
-	}
 
 	def runReport(ReportsQueue queue,Map params) {
 		/*

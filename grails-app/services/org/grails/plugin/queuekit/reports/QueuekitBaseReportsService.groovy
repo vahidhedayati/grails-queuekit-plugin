@@ -14,6 +14,7 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 
+import java.text.SimpleDateFormat
 import java.util.concurrent.RunnableFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
@@ -82,7 +83,48 @@ abstract class QueuekitBaseReportsService implements GrailsApplicationAware {
 	 */
 	abstract def actionInternal(out,bean, queryResults,Locale locale)
 
-	abstract Priority getQueuePriority(ReportsQueue queue, Map params)
+	/**
+	 * getQueuePriority is by default the queue's configuration priority
+	 *
+	 *  Take a look at XlsExample where a more specific lookup is done
+	 * @param queue
+	 * @param params
+	 * @return
+	 */
+	Priority getQueuePriority(ReportsQueue queue, Map params) {
+		Priority priority = queue?.priority ?: queue.defaultPriority
+		return priority
+	}
+	/**
+	 * Take a look at XlsExample1ReportingService
+	 * It uses it to parse the Date fields given by
+	 * end user. It will most likely be in String format
+	 * and call the one below
+	 * @param t
+	 * @return
+	 */
+	Date parseDate(Date t,String format=null) {
+		return t
+	}
+
+	Date parseDate(String t,String format=null) {
+		SimpleDateFormat sf
+		if (!format) {
+			/*
+			 * Fix for No thread-bound request found: Are you referring to request attributes
+			 */
+			def webRequest = RequestContextHolder.getRequestAttributes()
+			if(!webRequest) {
+				def servletContext  = ServletContextHolder.getServletContext()
+				def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
+				webRequest = grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
+			}
+			format = new SimpleDateFormat(g.message(code:'queuekit.defaultDate.format', default: 'dd MMM yyyy'))
+		}
+		sf = new SimpleDateFormat(format)
+		sf.setLenient(false)
+		if (sf)	return sf.parse(t)
+	}
 
 	/**
 	 * Override method called by your extended Service runReport method

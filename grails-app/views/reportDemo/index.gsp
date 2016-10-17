@@ -129,16 +129,6 @@ import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 class ParamsExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
-
-    /*
-     * Must be declared otherwise class errors.    
-     * Requirement from QueuekitBaseReportsService
-     * If you do not have any values to set copy and paste as below
-     */
-    Priority getQueuePriority(ReportsQueue queue, Map params) {
-		Priority priority = queue.priority ?: queue.defaultPriority		
-		return priority
-	}
 	
     /*
 	 * Must be declared gives you params 
@@ -256,8 +246,8 @@ class XlsExampleReportingService extends QueuekitBaseReportsService {
 	
 	
 	/**
-	 * This must exist and is a slightly more complex version than above
-	 * this is how you must interact with what params you expect from your actual user form
+	 * This is an alternative to default Configuration value or if not LOW priority and
+     * is how you must interact with what parameters you expect from your actual user form
 	 * and decide at this late stage - now that you are aware what they have posted
 	 * if the report should have a higher/lower priority
 	 */
