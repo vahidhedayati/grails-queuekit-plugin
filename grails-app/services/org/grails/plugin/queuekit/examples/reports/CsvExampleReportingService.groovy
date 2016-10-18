@@ -1,5 +1,7 @@
 package org.grails.plugin.queuekit.examples.reports
 
+import java.util.Map;
+
 import org.codehaus.groovy.grails.web.binding.DataBindingUtils
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.examples.Report3Bean
@@ -10,7 +12,49 @@ import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 class CsvExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
+	
+	Priority getQueuePriority(ReportsQueue queue, Map params) {
+		Priority priority = queue.priority ?: queue.defaultPriority
+		if (params.fromDate && params.toDate) {
+			Date toDate = parseDate(params.toDate)
+			Date fromDate = parseDate(params.fromDate)
+			int difference = toDate && fromDate ? (toDate - fromDate) : null
+			if (difference||difference==0) {
+				if (difference <= 1) {
+					// 1 day everything becomes HIGH priority
+					priority = Priority.HIGH
+				} else if  (difference >= 1 && difference <= 8) {
+					if (priority == Priority.HIGHEST) {
+						priority = Priority.HIGH
+					} else if (priority >= Priority.MEDIUM) {
+						priority = priority.value.previous()
+					}
+				} else if  (difference >= 8 && difference <= 31) {
+					if (priority <= Priority.HIGH) {
+						priority = Priority.MEDIUM
+					} else if (priority >= Priority.LOW) {
+						priority = priority.next()
+					}
+				} else if  (difference >= 31 && difference <= 186) {
+					if (priority >= Priority.MEDIUM && priority <= Priority.HIGHEST) {
+						priority = priority.next()
+					} else if (priority >= Priority.LOW) {
+						priority = priority.previous()
+					}
+				} else if  (difference >= 186) {
+					if (priority <= Priority.HIGH) {
+						priority = priority.next()
 
+					} else if (priority >= Priority.LOW) {
+						priority = priority.next()
+					}
+				}
+			}
+			log.info "priority is now ${priority} was previously ${priority} difference of date : ${difference}"
+		}		
+		return priority
+	}
+	
 	/*
 	 * We must define the report type file extension
 	 * default is tsv this being CSV needs to be defined
@@ -91,6 +135,7 @@ class CsvExampleReportingService extends QueuekitBaseReportsService {
 	 * @param bean
 	 * @return
 	 */
+	
 	String getFileName(bean) {
 		String filename
 		if (bean.report=='test1') {
@@ -109,8 +154,8 @@ class CsvExampleReportingService extends QueuekitBaseReportsService {
 	 * when user clicks to download fileName will be this 
 	 * 
 	 */
+
 	String getReportName(ReportsQueue queue,bean) {
 		return "${getFileName(bean)?:queue.reportName}-${queue.id}.${reportExension}"
 	}
-
 }

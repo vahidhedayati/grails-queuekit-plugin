@@ -1,8 +1,10 @@
 package org.grails.plugin.queuekit.validation
 
+import grails.util.Holders
 import groovy.transform.CompileStatic
 
 import org.grails.plugin.queuekit.ReportsQueue
+import org.grails.plugin.queuekit.priority.Priority
 
 /**
  * Created by Vahid Hedayati on 16/10/16.
@@ -27,4 +29,25 @@ class QueuekitLists {
     static final String USER='US'
     static final String REPORTNAME='RN'
     static final List SEARCH_TYPES=[USER,REPORTNAME]
+	
+	/**
+	 * Retrieve configuration value of reportPriorties
+	 * this should be a list containing key value e.g: ReportName:Priority.HIGH
+	 *
+	 * Assign report priority back if not set to DEFAULT LOW
+	 */
+	static Priority sortPriority(String reportName) {
+		Priority priority = Priority.LOW
+		Priority configProp =getConfigPriority(reportName)
+		if (configProp) {			
+			priority = configProp 
+		}
+		return priority
+	}
+	static Priority getConfigPriority(String reportName) {
+		return (getConfig('reportPriorities') as Map).find{k,v-> k==reportName}.value  as Priority 		
+	}
+	static def getConfig(String configProperty) {
+		 Holders.grailsApplication.config.queuekit[configProperty] ?: ''
+	}
 }

@@ -5,8 +5,8 @@ import grails.util.Holders
 
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
-import org.grails.plugin.queuekit.ComparableRunnable
 import org.grails.plugin.queuekit.QueuekitHelper
+import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 
 /**
  * 
@@ -44,6 +44,7 @@ class CompareFutureTask<T> extends ComparableFutureTask<T> implements Comparable
 	public int compareTo(Object o) {
 		int i = 0
 		String name = this.queue.reportName+this.queue.serviceLabel
+		String currentPriority = this.queue.priority
 		def currentService =  Holders.grailsApplication.mainContext.getBean(name)
 		Priority lhs = currentService.getQueuePriority(this.queue,JSON.parse(this.queue.paramsMap))
 		if (o instanceof CompareFutureTask) {
@@ -59,13 +60,7 @@ class CompareFutureTask<T> extends ComparableFutureTask<T> implements Comparable
 		}
 		
 		
-		if (enhancedPriorityBlockingExecutor.defaultComparator) {
-			/**
-			 * This is the defaultComparator and will return above result
-			 * nice and simple
-			 */
-			return i
-		} else {
+		if (!enhancedPriorityBlockingExecutor.defaultComparator) {
 			/**
 			 * This is some complex stuff going on to figure out if the current item should have a slot free
 			 * and given a slot if it should
@@ -88,9 +83,11 @@ class CompareFutureTask<T> extends ComparableFutureTask<T> implements Comparable
 			if (i>0 && slotsFree) {
 				i=-1
 			}
-			
-			return i
 		}
+		if (currentPriority!=lhs) {
+			QueuekitBaseReportsService.setLatestPriority(this.queue.id,lhs)
+		}
+		return i
 	}
 }
 

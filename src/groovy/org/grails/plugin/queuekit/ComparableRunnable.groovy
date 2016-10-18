@@ -3,10 +3,8 @@ package org.grails.plugin.queuekit
 import grails.converters.JSON
 import grails.util.Holders
 
-import org.grails.plugin.queuekit.priority.CompareFutureTask
-import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.Priority
-import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
+import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 
 /**
  * 
@@ -74,6 +72,7 @@ class ComparableRunnable implements Runnable, Comparable {
 	public int compareTo(Object o) {
 		int i = 0
 		String name = this.queue.reportName+this.queue.serviceLabel
+		def currentPriority = this.queue.priority
 		def currentService =  Holders.grailsApplication.mainContext.getBean(name)		
 		Priority lhs = currentService.getQueuePriority(this.queue,JSON.parse(this.queue.paramsMap))
 		if (o instanceof ComparableRunnable) {
@@ -85,6 +84,9 @@ class ComparableRunnable implements Runnable, Comparable {
 				i=-1
 			} else if (lhs.value > rhs.value) {
 				i=1
+			}
+			if (currentPriority!=lhs) {
+				QueuekitBaseReportsService.setLatestPriority(this.queue.id,lhs)
 			}
 		}
 		return i

@@ -65,8 +65,11 @@ class Report3Bean {
 		map.countrySelected=countrySelected
 		map.fromDate=getFromDate()
 		map.toDate=getToDate()
+		
 		map.reportType=reportType
 		map.priority=priority
+		//map."priority.value"=priority.value
+		//map.priority=[value:priority.value]
 		return map
 	}
 
