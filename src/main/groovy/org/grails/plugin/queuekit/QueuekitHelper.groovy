@@ -1,9 +1,7 @@
 package org.grails.plugin.queuekit
 
-import grails.util.Holders
 import org.grails.plugin.queuekit.priority.ComparableFutureTask
 import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
-import org.grails.plugin.queuekit.priority.Priority
 
 import java.util.concurrent.PriorityBlockingQueue
 
@@ -15,22 +13,6 @@ import java.util.concurrent.PriorityBlockingQueue
  */
 
 class QueuekitHelper {
-	/**
-	 * Retrieve configuration value of reportPriorties 
-	 * this should be a list containing key value e.g: ReportName:Priority.HIGH
-	 * 
-	 * Assign report priority back if not set to DEFAULT LOW 
-	 */
-	static Priority sortPriority(String reportName) {
-		Priority priority = Priority.LOW
-		def priorities = Holders.grailsApplication.config.queuekit.reportPriorities
-		if (priorities) {
-			priority = priorities.get(reportName) ?: Priority.LOW
-		}
-		return priority
-	}
-
-
 	/**
 	 * changeMaxPoolSize is another deeply complex bit of code that I have spent ages on 
 	 * still not perfected it.

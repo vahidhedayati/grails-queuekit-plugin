@@ -38,20 +38,20 @@ class XlsExample1ReportingService extends QueuekitBaseReportsService {
 					if (priority <= Priority.HIGH) {
 						priority = Priority.MEDIUM
 					} else if (priority >= Priority.LOW) {
-						priority = priority.value.next()
+						priority = priority.next()
 					}
 				} else if  (difference >= 31 && difference <= 186) {
 					if (priority >= Priority.MEDIUM && priority <= Priority.HIGHEST) {
-						priority = priority.value.previous()
+						priority = priority.next()
 					} else if (priority >= Priority.LOW) {
-						priority = Priority.value.next()
+						priority = priority.previous()
 					}
 				} else if  (difference >= 186) {
 					if (priority <= Priority.HIGH) {
-						priority = priority.value.previous()
+						priority = priority.next()
 
 					} else if (priority >= Priority.LOW) {
-						priority = Priority.value.next()
+						priority = priority.next()
 					}
 				}
 			}

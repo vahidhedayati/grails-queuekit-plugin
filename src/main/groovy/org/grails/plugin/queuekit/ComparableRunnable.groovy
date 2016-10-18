@@ -3,6 +3,7 @@ package org.grails.plugin.queuekit
 import grails.converters.JSON
 import grails.util.Holders
 import org.grails.plugin.queuekit.priority.Priority
+import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 
 class ComparableRunnable implements Runnable, Comparable {
 
@@ -57,18 +58,22 @@ class ComparableRunnable implements Runnable, Comparable {
 	@Override
 	public int compareTo(Object o) {
 		int i = 0
-		String name = this.queue.reportName + this.queue.serviceLabel
-		def currentService = Holders.grailsApplication.mainContext.getBean(name)
-		Priority lhs = currentService.getQueuePriority(this.queue, JSON.parse(this.queue.paramsMap))
+		String name = this.queue.reportName+this.queue.serviceLabel
+		def currentPriority = this.queue.priority
+		def currentService =  Holders.grailsApplication.mainContext.getBean(name)
+		Priority lhs = currentService.getQueuePriority(this.queue,JSON.parse(this.queue.paramsMap))
 		if (o instanceof ComparableRunnable) {
-			name = o.queue.reportName + o.queue.serviceLabel
-			currentService = Holders.grailsApplication.mainContext.getBean(name)
-			Priority rhs = currentService.getQueuePriority(o.queue, JSON.parse(o.queue.paramsMap))
+			name = o.queue.reportName+o.queue.serviceLabel
+			currentService =  Holders.grailsApplication.mainContext.getBean(name)
+			Priority rhs = currentService.getQueuePriority(o.queue,JSON.parse(o.queue.paramsMap))
 			//i = lhs.getValue() <=> rhs.getValue()
 			if (lhs.value < rhs.value) {
-				i = -1
+				i=-1
 			} else if (lhs.value > rhs.value) {
-				i = 1
+				i=1
+			}
+			if (currentPriority!=lhs) {
+				QueuekitBaseReportsService.setLatestPriority(this.queue.id,lhs)
 			}
 		}
 		return i

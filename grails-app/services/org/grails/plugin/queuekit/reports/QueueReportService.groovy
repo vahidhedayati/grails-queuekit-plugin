@@ -517,7 +517,7 @@ class QueueReportService implements GrailsApplicationAware {
 				instance.initiationColor=returnColor(threshHold,instance.initiation)
 			}
 			if (instance.queueType==ReportsQueue.PRIORITYBLOCKING||instance.queueType==ReportsQueue.ENHANCEDPRIORITYBLOCKING) {
-				instance.priority=instance.priority?:QueuekitHelper.sortPriority(instance.realReport)
+				instance.priority=instance.priority?:QueuekitLists.sortPriority(instance.realReport)
 			}
 			instance.username = queuekitUserService.getUsername(instance.userId)
 		}
@@ -828,15 +828,16 @@ class QueueReportService implements GrailsApplicationAware {
 		queue.fileName=bean.fileName
 		queue.fromController=bean.fromController
 		queue.fromAction=bean.fromAction
-
 		if (bean.priority && queue.hasPriority()) {
-			if (config.standardRunnable && config.disableUserServicePriorityCheck) {
-				queue.priority= queuekitUserService.reportPriority(queue,bean.priority,bean.parameters)
-			} else {
-				queue.priority=bean.priority
+			if (config.standardRunnable) {
+				if (!config.disableUserServicePriorityCheck) {
+					queue.priority= bean.priority ?: queuekitUserService.reportPriority(queue,bean.priority,bean.parameters)
+				}
+			}
+			if (!queue.priority) {
+				queue.priority = bean.priority ?: QueuekitLists.sortPriority(bean.reportName)
 			}
 		}
-
 		queue.created=new Date()
 		queue.save(flush:true)
 

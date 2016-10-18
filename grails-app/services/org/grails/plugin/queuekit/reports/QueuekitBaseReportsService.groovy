@@ -117,9 +117,10 @@ abstract class QueuekitBaseReportsService implements GrailsApplicationAware {
 			if(!webRequest) {
 				def servletContext  = ServletContextHolder.getServletContext()
 				def applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-				webRequest = grails.util.GrailsWebUtil.bindMockWebRequest(applicationContext)
+				webRequest =  grails.util.GrailsWebMockUtil.bindMockWebRequest(applicationContext)
 			}
-			format = new SimpleDateFormat(g.message(code:'queuekit.defaultDate.format', default: 'dd MMM yyyy'))
+
+			format =g.message(code:'queuekit.defaultDate.format', default: 'dd MMM yyyy')
 		}
 		sf = new SimpleDateFormat(format)
 		sf.setLenient(false)
@@ -300,6 +301,14 @@ abstract class QueuekitBaseReportsService implements GrailsApplicationAware {
 			}
 		}
 		return isManual
+	}
+
+	static void setLatestPriority(Long queueId, Priority priority) {
+		ReportsQueue.withNewTransaction {
+			ReportsQueue queue3=ReportsQueue.get(queueId)
+			queue3.priority=priority
+			queue3.save(flush:true)
+		}
 	}
 
 
