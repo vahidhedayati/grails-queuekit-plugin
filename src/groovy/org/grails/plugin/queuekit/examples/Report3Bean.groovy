@@ -40,6 +40,14 @@ class Report3Bean {
 		return toDate.format(message)
 	}
 	
+	String getFromDateRaw() {
+		return fromDate
+	}
+	
+	String getToDateRaw() {
+		return toDate
+	}
+	
 	void setFromDate(String t) {
 		 SimpleDateFormat sf = new SimpleDateFormat(message)
 		fromDate= sf.parse(t)
@@ -55,7 +63,7 @@ class Report3Bean {
 	}
 	
 	static constraints = {
-		countrySelected(nullable:true, inList:countries.key)
+		countrySelected(nullable:true, inList:countries.name)
 		reportType(inList:ReportsQueue.REPORT_TYPES)
 	}
 	Map loadValues() {
@@ -63,8 +71,8 @@ class Report3Bean {
 		map.report=report
 		map.sample=sample
 		map.countrySelected=countrySelected
-		map.fromDate=getFromDate()
-		map.toDate=getToDate()
+		map.fromDate=fromDate //getFromDate()
+		map.toDate=toDate //getToDate()
 		
 		map.reportType=reportType
 		map.priority=priority

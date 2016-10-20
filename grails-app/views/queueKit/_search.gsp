@@ -32,7 +32,12 @@
 		<li>
 		<g:select name="status" class="form-control small" from="${statuses}" noSelection="${['':"${g.message(code:'queuekit.chooseStatus.label')}"]}"
 		value="${search?.status}" onChange="reloadPage();" valueMessagePrefix="queuekit.reportType" />
-		</li>		
+		</li>
+		<g:if test="${superUser}">
+		<li>
+			<g:checkBox name="hideUsers" value="${search.hideUsers}"/> <g:message code="queuekit.hideOtherUsers.label"/>
+		</li>
+		</g:if>		
 		<li>
 			<g:hiddenField name="jobControl" value="${search?.jobControl}"/>
 			<button type="submit" class="submitButton" name="submit" >${message(code: 'queuekit.search.label')}</button>	

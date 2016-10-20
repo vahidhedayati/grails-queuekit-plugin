@@ -26,7 +26,7 @@ class LinkedBlockingReportsQueueService extends QueuekitExecutorBaseService  imp
 	 */
 
 	void onApplicationEvent(LinkedBlockingQueuedEvent event) {
-		log.info "Received ${event.source}"
+		log.debug "Received ${event.source}"
 		LinkedBlockingReportsQueue queue=LinkedBlockingReportsQueue.read(event.source)
 		if (queue && (queue.status==ReportsQueue.QUEUED||queue.status==ReportsQueue.ERROR)) {
 

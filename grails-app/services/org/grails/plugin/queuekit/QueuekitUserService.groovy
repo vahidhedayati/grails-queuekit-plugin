@@ -192,39 +192,43 @@ class QueuekitUserService {
 					if (priority == Priority.HIGHEST) {
 						priority = Priority.HIGH
 					} else if (priority >= Priority.MEDIUM) {
-						priority = priority.value--
+						priority = priority.value.previous()
 					}
 				} else if  (difference >= 8 && difference <= 31) {
 					if (priority <= Priority.HIGH) {
 						priority = Priority.MEDIUM
 					} else if (priority >= Priority.LOW) {
-						priority = priority.MEDIUM
+						priority = priority.next()
 					}
 				} else if  (difference >= 31 && difference <= 186) {
 					if (priority >= Priority.MEDIUM && priority <= Priority.HIGHEST) {
-						priority = priority.value--
+						priority = priority.next()
 					} else if (priority >= Priority.LOW) {
-						priority = Priority.MEDIUM
+						priority = priority.previous()
 					}
 				} else if  (difference >= 186) {
 					if (priority <= Priority.HIGH) {
-						priority = priority.value--
+						priority = priority.next()
 
 					} else if (priority >= Priority.LOW) {
-						priority = Priority.MEDIUM
+						priority = priority.next()
 					}
 				}
 			}
-		}
+			log.debug "priority is now ${priority} was previously ${priority} difference of date : ${difference}"
+		}		
 		return priority
 	}
 
-	Date parseDate(Date t) {
+	Date parseDate(Date t,String format=null) {
 		return t
 	}
 
-	Date parseDate(String t) {
-		SimpleDateFormat sf = new SimpleDateFormat(g.message(code:'queuekit.defaultDate.format', default: 'dd MMM yyyy'))
+	Date parseDate(String t, String format=null) {
+		if (!format) {
+			format=g.message(code:'queuekit.defaultDate.format', default: 'dd MMM yyyy')
+		}
+		SimpleDateFormat sf = new SimpleDateFormat(format)
 		sf.setLenient(false)
 		if (sf)	return sf.parse(t)
 	}

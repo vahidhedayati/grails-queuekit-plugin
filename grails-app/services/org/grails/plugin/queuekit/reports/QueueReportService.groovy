@@ -460,28 +460,27 @@ class QueueReportService {
 		rq.finished as finishDate, rq.status as status
 	)
 	from ReportsQueue rq  """
-
-		if (!bean.superUser || (bean.superUser && (bean.status != ReportsQueue.OTHERUSERS||bean.searchBy && bean.searchBy!=QueuekitLists.USER))) {
+		boolean superUser = bean.superUser
+		if (!superUser || (superUser && (bean.searchBy && bean.searchBy!=QueuekitLists.USER||bean.hideUsers))) {
 			where=addClause(where,'rq.userId=:userId')
 			whereParams.userId=bean.userId
 		}
-		if (!bean.superUser && bean.status!=ReportsQueue.DOWNLOADED ||bean.superUser && (bean.status!=ReportsQueue.DELETED||bean.status!=ReportsQueue.DOWNLOADED)) {
-			where=addClause(where,'rq.status not in (:statuses) ')
-			def statuses=[]
-
-			if (!bean.superUser||bean.superUser && bean.status != ReportsQueue.DOWNLOADED) {
-				statuses << ReportsQueue.DOWNLOADED
+		
+		def statuses=[]
+		String add=''
+		if (bean.status) {
+			if (bean.status == ReportsQueue.ACTIVE) {
+				statuses= superUser ? ReportsQueue.REPORT_STATUS_ALL : ReportsQueue.REPORT_STATUS
+			} else {
+				statuses << bean.status
 			}
-			if (!bean.superUser||bean.superUser && bean.status != ReportsQueue.DELETED) {
-				statuses << ReportsQueue.DELETED
-			}
-			whereParams.statuses=statuses
+		} else {
+			add='not'			
+			statuses << ReportsQueue.DOWNLOADED
+			statuses << ReportsQueue.DELETED			
 		}
-
-		if (bean.status && bean.status != ReportsQueue.OTHERUSERS) {
-			where=addClause(where,'rq.status=:status')
-			whereParams.status=bean.status
-		}
+		where=addClause(where,"rq.status ${add} in (:statuses) ")
+		whereParams.statuses=statuses
 
 		if (bean.searchBy) {
 			if (bean.searchBy==QueuekitLists.REPORTNAME) {

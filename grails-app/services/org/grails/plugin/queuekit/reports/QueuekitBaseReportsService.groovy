@@ -244,7 +244,7 @@ abstract class QueuekitBaseReportsService  {
 								 */
 								EnhancedPriorityBlockingExecutor?.runningJobs.remove(task)
 							} finally {
-								log.info " Finished: Open Tasks: ${timeoutExecutor?.shutdownNow()?.size()}"
+								log.debug " Finished: Open Tasks: ${timeoutExecutor?.shutdownNow()?.size()}"
 							}
 						}
 					}
@@ -288,23 +288,15 @@ abstract class QueuekitBaseReportsService  {
 	 * @param queueId
 	 * @return
 	 */
-	static boolean isManual(Long queueId) {
-		boolean isManual=false
+	boolean isManual(Long queueId) {
+		boolean manual=false
 		ReportsQueue.withNewTransaction {
 			ReportsQueue queue3=ReportsQueue.get(queueId)
 			if (queue3.manualDownload && queue3.manualDownload==1) {
-				isManual=true
+				manual=true
 			}
 		}
-		return isManual
-	}
-	
-	static void setLatestPriority(Long queueId, Priority priority) {
-		ReportsQueue.withNewTransaction {
-			ReportsQueue queue3=ReportsQueue.get(queueId)
-			queue3.priority=priority
-			queue3.save(flush:true)
-		}
+		return manual
 	}
 
 
@@ -350,7 +342,7 @@ abstract class QueuekitBaseReportsService  {
 				queue2.finished=new Date()
 				queue2.save(flush:true)
 			} else {
-				//log.info "Queue ${queueId} has real status of ${queue2.status} had been ${status}. Task will be interrupted"
+				log.debug "Queue ${queueId} has real status of ${queue2.status} had been ${status}. Task will be interrupted"
 				Thread.currentThread().interrupt()
 			}
 		}

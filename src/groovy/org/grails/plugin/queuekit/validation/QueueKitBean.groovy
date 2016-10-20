@@ -16,7 +16,7 @@ class QueueKitBean {
 	String searchBy
 	String searchFor
 	Long userSearchId
-
+	boolean hideUsers=true
 	String status
 
 	Integer max=Math.min(10, 50)
@@ -104,6 +104,7 @@ class QueueKitBean {
 			offset:offset,
 			position:position,
 			order:order,
+			hideUsers:hideUsers,
 			jobControl:jobControl,
 			max:max
 		]

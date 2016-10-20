@@ -21,7 +21,7 @@ class PriorityBlockingReportsQueueService extends QueuekitExecutorBaseService  i
 	def priorityBlockingExecutor
 
 	void onApplicationEvent(PriorityBlockingQueuedEvent event) {
-		log.info "Received ${event.source}"
+		log.debug "Received ${event.source}"
 
 		/*
 		 * We are working with PriorityBlockingQueuedEvent which is a direct relation to

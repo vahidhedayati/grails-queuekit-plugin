@@ -35,7 +35,7 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  impl
 	def arrayBlockingExecutor
 
 	void onApplicationEvent(ArrayBlockingQueuedEvent event) {
-		log.info "Received ${event.source}"
+		log.debug "Received ${event.source}"
 
 		/*
 		 * We are working with ArrayBlockingQueuedEvent which is a direct relation to
@@ -121,7 +121,7 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  impl
 		def jobs = jobsAvailable
 		def running = jobs.running
 		def threadLimit = jobs.threadLimit
-		log.info "waiting reports ${waiting.size()} Jobs available: ${jobs}"
+		log.debug "waiting reports ${waiting.size()} Jobs available: ${jobs}"
 		waiting?.each{queue ->
 			if (running < threadLimit) {
 				setRequeueDate(queue.id)

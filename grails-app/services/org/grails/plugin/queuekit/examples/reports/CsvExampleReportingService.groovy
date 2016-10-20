@@ -12,7 +12,31 @@ import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 class CsvExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
-	
+	/**
+	 * This overrides the default priority of the report set by
+	 * QueuekitBaseReportsService
+	 *
+	 * By default it is either as per configuration or if not by default
+	 * LOW priority.
+	 *
+	 * At this point you can parse through your params and decide if in this example
+	 * that the given range fromDate/toDate provided is within a day make report
+	 * HIGHEST
+	 * if within a week HIGH and so on
+	 *
+	 * This priority check takes place if you are using
+	 * standard standardRunnable = false if your report default type is
+	 * EnhancedBlocking
+	 * if disableUserServicePriorityCheck=false and standardRunnable = true
+	 * then it should use the priority method very similar to this in
+	 *
+	 * queuekitUserService. This is the service you are supposed to extend
+	 * and declare as a bean back as queuekitUserService.
+	 *
+	 * Then you can control priority through this service call and a more
+	 * centralised control can be configured/setup.
+	 *
+	 */
 	Priority getQueuePriority(ReportsQueue queue, Map params) {
 		Priority priority = queue.priority ?: queue.defaultPriority
 		if (params.fromDate && params.toDate) {
@@ -42,15 +66,14 @@ class CsvExampleReportingService extends QueuekitBaseReportsService {
 						priority = priority.previous()
 					}
 				} else if  (difference >= 186) {
-					if (priority <= Priority.HIGH) {
-						priority = priority.next()
-
+					if (priority <= Priority.LOWEST) {
+						priority = priority.previous()
 					} else if (priority >= Priority.LOW) {
 						priority = priority.next()
 					}
 				}
 			}
-			log.info "priority is now ${priority} was previously ${priority} difference of date : ${difference}"
+			log.debug "priority is now ${priority} was previously ${priority} difference of date : ${difference}"
 		}		
 		return priority
 	}
@@ -112,9 +135,9 @@ class CsvExampleReportingService extends QueuekitBaseReportsService {
 		out << '\rpriority,'
 		out << bean?.priority
 		out << '\rfromDate,'
-		out << bean?.fromDate
+		out << bean?.fromDateRaw
 		out << '\rtoDate,'
-		out << bean?.toDate
+		out << bean?.toDateRaw
 		out << '\r'
 		queryResults?.each{field->
 			out << field.id << ','

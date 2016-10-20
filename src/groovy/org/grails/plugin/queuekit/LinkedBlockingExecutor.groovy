@@ -62,8 +62,12 @@ class LinkedBlockingExecutor extends ThreadPoolExecutor {
 		/**
 		 * Bypass Rejection Handler and use our custom method which
 		 *  attempts to call alternateExecutor if configuration is enabled
+		 *  
 		 */
-		super.setRejectedExecutionHandler(new EnhancedRejectedExecutionHandler())
+		
+		//if (maxQueue > (super?.getQueue()?.size()?:0)){
+			super.setRejectedExecutionHandler(new EnhancedRejectedExecutionHandler())
+		//}
 	}
 	
 	

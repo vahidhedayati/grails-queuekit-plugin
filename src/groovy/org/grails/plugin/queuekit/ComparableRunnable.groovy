@@ -73,7 +73,7 @@ class ComparableRunnable implements Runnable, Comparable {
 		int i = 0
 		String name = this.queue.reportName+this.queue.serviceLabel
 		def currentPriority = this.queue.priority
-		def currentService =  Holders.grailsApplication.mainContext.getBean(name)		
+		def currentService =  Holders.grailsApplication.mainContext.getBean(name)
 		Priority lhs = currentService.getQueuePriority(this.queue,JSON.parse(this.queue.paramsMap))
 		if (o instanceof ComparableRunnable) {
 			name = o.queue.reportName+o.queue.serviceLabel
@@ -86,7 +86,8 @@ class ComparableRunnable implements Runnable, Comparable {
 				i=1
 			}
 			if (currentPriority!=lhs) {
-				QueuekitBaseReportsService.setLatestPriority(this.queue.id,lhs)
+				currentService =  Holders.grailsApplication.mainContext.getBean('enhancedPriorityBlockingExecutor')
+				currentService.setLatestPriority(this.queue.id,lhs)
 			}
 		}
 		return i

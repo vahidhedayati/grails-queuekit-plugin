@@ -38,7 +38,6 @@ class ReportsQueue {
 
 	String status=QUEUED
 
-
 	private static final long serialVersionUID = 1L
 
 	static final String ENHANCEDPRIORITYBLOCKING='E'
@@ -47,7 +46,7 @@ class ReportsQueue {
 	static final String ARRAYBLOCKING='A'
 	static final List REPORT_TYPES=[ENHANCEDPRIORITYBLOCKING,PRIORITYBLOCKING,LINKEDBLOCKING,ARRAYBLOCKING]
 	
-	
+	static final String ACTIVE='AC'		//ALL STATUSES
 	static final String QUEUED='QU'
 	static final String ERROR='ER'
 	static final String RUNNING='RU'
@@ -56,11 +55,9 @@ class ReportsQueue {
 	static final String DELETED='DE'
 	static final String DOWNLOADED='DO'
 	static final String NORESULTS='NR'
-	static final String OTHERUSERS='OU'
 	
-	
-	static final List REPORT_STATUS_ALL=[QUEUED,DOWNLOADED,RUNNING,COMPLETED,DELETED,ERROR,CANCELLED,NORESULTS,OTHERUSERS]
-	static final List REPORT_STATUS=REPORT_STATUS_ALL-[DELETED,OTHERUSERS]
+	static final List REPORT_STATUS_ALL=[ACTIVE,QUEUED,DOWNLOADED,RUNNING,COMPLETED,DELETED,ERROR,CANCELLED,NORESULTS]
+	static final List REPORT_STATUS=REPORT_STATUS_ALL-[DELETED]
 	
 	static constraints={
 		status(maxSize:2,inList:REPORT_STATUS_ALL)

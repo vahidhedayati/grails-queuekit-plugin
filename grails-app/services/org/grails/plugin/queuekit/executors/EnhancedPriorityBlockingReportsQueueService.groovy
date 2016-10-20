@@ -23,7 +23,7 @@ class EnhancedPriorityBlockingReportsQueueService extends QueuekitExecutorBaseSe
 
 
 	void onApplicationEvent(EnhancedPriorityBlockingQueuedEvent event) {
-		log.info "Received ${event.source}"
+		log.debug "Received ${event.source}"
 		/*
 		 * We are working with EnhancedPriorityBlockingQueuedEvent which is a direct relation to
 		 *  EnhancedPriorityBlockingReportsQueue domainClass

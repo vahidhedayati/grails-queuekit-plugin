@@ -81,7 +81,7 @@ class QueuekitExecutorBaseService {
 		ReportsQueue.withNewTransaction {
 			waiting=ReportsQueue.executeQuery(query,inputParams,metaParams)
 		}
-		log.info "waiting reports ${waiting.size()}"
+		log.debug "waiting reports ${waiting.size()}"
 		waiting?.each{queue ->
 
 			new Thread({
@@ -165,7 +165,7 @@ class QueuekitExecutorBaseService {
 		ReportsQueue.withNewTransaction{
 			def running = ReportsQueue.where{status==ReportsQueue.RUNNING}.findAll()
 			running.each { ReportsQueue queue ->
-				log.info "Job ${queue.id} had been running. Setting status to queued"
+				log.debug "Job ${queue.id} had been running. Setting status to queued"
 				queue.status=ReportsQueue.QUEUED
 				queue.save(flush:true)
 			}
