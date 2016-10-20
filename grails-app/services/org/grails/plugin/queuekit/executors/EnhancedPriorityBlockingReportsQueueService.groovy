@@ -25,7 +25,7 @@ class EnhancedPriorityBlockingReportsQueueService extends QueuekitExecutorBaseSe
 
 	@Selector('method.enhancedPriorityBlocking')
 	void linkedBlocking(Long eventId) {
-		log.info "Received ${eventId}"
+		log.debug "Received ${eventId}"
 		/*
 		 * We are working with EnhancedPriorityBlockingQueuedEvent which is a direct relation to
 		 *  EnhancedPriorityBlockingReportsQueue domainClass

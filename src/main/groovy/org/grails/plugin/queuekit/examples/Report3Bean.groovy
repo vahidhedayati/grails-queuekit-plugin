@@ -37,23 +37,31 @@ class Report3Bean   implements Validateable {
 	String getToDate() {
 		return toDate.format(message)
 	}
-	
+
+	String getFromDateRaw() {
+		return fromDate
+	}
+
+	String getToDateRaw() {
+		return toDate
+	}
+
 	void setFromDate(String t) {
-		 SimpleDateFormat sf = new SimpleDateFormat(message)
+		SimpleDateFormat sf = new SimpleDateFormat(message)
 		fromDate= sf.parse(t)
 	}
-	
+
 	void setToDate(String t) {
-		 SimpleDateFormat sf = new SimpleDateFormat(message)
+		SimpleDateFormat sf = new SimpleDateFormat(message)
 		toDate= sf.parse(t)
 	}
-	
+
 	String getMessage() {
 		return g.message(code:'queuekit.defaultDate.format', default: 'dd MMM yyyy')
 	}
-	
+
 	static constraints = {
-		countrySelected(nullable:true, inList:countries.key)
+		countrySelected(nullable:true, inList:countries.name)
 		reportType(inList:ReportsQueue.REPORT_TYPES)
 	}
 	Map loadValues() {
@@ -63,10 +71,12 @@ class Report3Bean   implements Validateable {
 		map.countrySelected=countrySelected
 		map.fromDate=getFromDate()
 		map.toDate=getToDate()
+
 		map.reportType=reportType
 		map.priority=priority
+		//map."priority.value"=priority.value
+		//map.priority=[value:priority.value]
 		return map
 	}
-
 
 }

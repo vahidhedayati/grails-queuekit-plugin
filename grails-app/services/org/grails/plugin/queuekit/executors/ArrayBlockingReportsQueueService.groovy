@@ -32,7 +32,7 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 
 	@Selector('method.arrayBlocking')
 	void arrayBlocking(Long eventId) {
-		log.info "Received ${eventId}"
+		log.debug "Received ${eventId}"
 
 		/*
 		 * We are working with ArrayBlockingQueuedEvent which is a direct relation to
@@ -119,7 +119,7 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 		def jobs = jobsAvailable
 		def running = jobs.running
 		def threadLimit = jobs.threadLimit
-		log.info "waiting reports ${waiting.size()} Jobs available: ${jobs}"
+		log.debug "waiting reports ${waiting.size()} Jobs available: ${jobs}"
 		waiting?.each{queue ->
 			if (running < threadLimit) {
 				setRequeueDate(queue.id)

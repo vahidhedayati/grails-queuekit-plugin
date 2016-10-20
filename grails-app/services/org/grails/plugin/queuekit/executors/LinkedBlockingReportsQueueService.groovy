@@ -28,7 +28,7 @@ class LinkedBlockingReportsQueueService extends QueuekitExecutorBaseService {
 
 	@Selector('method.linkedBlocking')
 	void linkedBlocking(Long eventId) {
-		log.info "Received ${eventId}"
+		log.debug "Received ${eventId}"
 		LinkedBlockingReportsQueue.withTransaction {
 			LinkedBlockingReportsQueue queue = LinkedBlockingReportsQueue.read(eventId)
 			if (queue && (queue.status == ReportsQueue.QUEUED || queue.status == ReportsQueue.ERROR)) {

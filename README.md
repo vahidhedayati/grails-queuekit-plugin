@@ -22,14 +22,14 @@ queuekit
 
 ### Grails 3: 
 ```groovy
-compile "org.grails.plugins:queuekit:1.6"
+compile "org.grails.plugins:queuekit:1.7"
 ```
  
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/) | [demo](https://github.com/vahidhedayati/test-queuekit3/) 
 
 ### Grails 2: 
 ```groovy
-compile ":queuekit:1.1"
+compile ":queuekit:1.2"
 ```
 
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/grails2) | [demo](https://github.com/vahidhedayati/test-queuekit)

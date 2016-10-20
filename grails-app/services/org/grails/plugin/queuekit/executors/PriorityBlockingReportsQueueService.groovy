@@ -23,7 +23,7 @@ class PriorityBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 
 	@Selector('method.priorityBlocking')
 	void priorityBlocking(Long eventId) {
-		log.info "Received ${eventId}"
+		log.debug "Received ${eventId}"
 
 		/*
 		 * We are working with PriorityBlockingQueuedEvent which is a direct relation to

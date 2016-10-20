@@ -84,7 +84,7 @@ class CompareFutureTask<T> extends ComparableFutureTask<T> implements Comparable
 			}
 		}
 		if (currentPriority!=lhs) {
-			QueuekitBaseReportsService.setLatestPriority(this.queue.id,lhs)
+			enhancedPriorityBlockingExecutor.setLatestPriority(this.queue.id,lhs)
 		}
 		return i
 	}

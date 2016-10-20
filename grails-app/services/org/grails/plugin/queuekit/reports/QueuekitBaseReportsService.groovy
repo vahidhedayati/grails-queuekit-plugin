@@ -249,7 +249,7 @@ abstract class QueuekitBaseReportsService implements GrailsApplicationAware {
 								 */
 								EnhancedPriorityBlockingExecutor?.runningJobs.remove(task)
 							} finally {
-								log.info " Finished: Open Tasks: ${timeoutExecutor?.shutdownNow()?.size()}"
+								log.debug " Finished: Open Tasks: ${timeoutExecutor?.shutdownNow()?.size()}"
 							}
 						}
 					}
@@ -292,15 +292,15 @@ abstract class QueuekitBaseReportsService implements GrailsApplicationAware {
 	 * @param queueId
 	 * @return
 	 */
-	static boolean isManual(Long queueId) {
-		boolean isManual=false
+	boolean isManual(Long queueId) {
+		boolean manual=false
 		ReportsQueue.withNewTransaction {
 			ReportsQueue queue3=ReportsQueue.get(queueId)
 			if (queue3.manualDownload && queue3.manualDownload==1) {
-				isManual=true
+				manual=true
 			}
 		}
-		return isManual
+		return manual
 	}
 
 	static void setLatestPriority(Long queueId, Priority priority) {

@@ -129,6 +129,7 @@ import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
 class ParamsExampleReportingService extends QueuekitBaseReportsService {
 
 	def tsvService
+
 	
     /*
 	 * Must be declared gives you params 
@@ -244,12 +245,30 @@ class XlsExampleReportingService extends QueuekitBaseReportsService {
 		return 'xls'
 	}
 	
-	
 	/**
-	 * This is an alternative to default Configuration value or if not LOW priority and
-     * is how you must interact with what parameters you expect from your actual user form
-	 * and decide at this late stage - now that you are aware what they have posted
-	 * if the report should have a higher/lower priority
+	 * This overrides the default priority of the report set by
+	 * QueuekitBaseReportsService
+	 *
+	 * By default it is either as per configuration or if not by default
+	 * LOW priority.
+	 *
+	 * At this point you can parse through your params and decide if in this example
+	 * that the given range fromDate/toDate provided is within a day make report
+	 * HIGHEST
+	 * if within a week HIGH and so on
+	 *
+	 * This priority check takes place if you are using
+	 * standard standardRunnable = false if your report default type is
+	 * EnhancedBlocking
+	 * if disableUserServicePriorityCheck=false and standardRunnable = true
+	 * then it should use the priority method very similar to this in
+	 *
+	 * queuekitUserService. This is the service you are supposed to extend
+	 * and declare as a bean back as queuekitUserService.
+	 *
+	 * Then you can control priority through this service call and a more
+	 * centralised control can be configured/setup.
+	 *
 	 */
 	Priority getQueuePriority(ReportsQueue queue, Map params) {
 		Priority priority = queue.priority ?: queue.defaultPriority
@@ -267,9 +286,28 @@ class XlsExampleReportingService extends QueuekitBaseReportsService {
 					} else if (priority >= Priority.MEDIUM) {
 						priority = priority.value.previous()
 					}
+				} else if  (difference >= 8 && difference <= 31) {
+					if (priority <= Priority.HIGH) {
+						priority = Priority.MEDIUM
+					} else if (priority >= Priority.LOW) {
+						priority = priority.next()
+					}
+				} else if  (difference >= 31 && difference <= 186) {
+					if (priority >= Priority.MEDIUM && priority <= Priority.HIGHEST) {
+						priority = priority.next()
+					} else if (priority >= Priority.LOW) {
+						priority = priority.previous()
+					}
+				} else if  (difference >= 186) {
+					if (priority <= Priority.LOWEST) {
+						priority = priority.previous()
+					} else if (priority >= Priority.LOW) {
+						priority = priority.next()
+					}
 				}
 			}
-		}
+			log.debug "priority is now &#36;{priority} was previously &#36;{priority} difference of date : &#36;{difference}"
+		}		
 		return priority
 	}
 	

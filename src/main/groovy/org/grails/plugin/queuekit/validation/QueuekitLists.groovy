@@ -22,7 +22,7 @@ class QueuekitLists {
     static final List CHANGE_TYPES=[POOL,MAXQUEUE,PRESERVE,DEFAULTCOMPARATOR,FLOODCONTROL,LIMITUSERABOVE,LIMITUSERBELOW,CHECKQUEUE,STOPEXECUTOR]
 
     static final String DELALL='AL'
-    static final def deleteList = ReportsQueue.REPORT_STATUS_ALL-[ReportsQueue.DELETED, ReportsQueue.RUNNING, ReportsQueue.OTHERUSERS]+[DELALL]
+	static final def deleteList = ReportsQueue.REPORT_STATUS_ALL-[ReportsQueue.DELETED, ReportsQueue.RUNNING]+[DELALL]
 
 
     static final String USER='US'

@@ -346,7 +346,10 @@ class ReportDemoController implements GrailsApplicationAware {
 	/*
 	 * finishing action for index8
 	 */
-	def  customName(Report3Bean  bean) {
+	def  customName(Report3Bean bean) {
+		if (!bean.validate()) {
+			log.debug "Errors: ${bean.errors}"
+		}
 		def locale = RequestContextUtils.getLocale(request)
 		def userId = bean.userId ?: queuekitUserService.currentuser
 		String reportName = 'csvExample'

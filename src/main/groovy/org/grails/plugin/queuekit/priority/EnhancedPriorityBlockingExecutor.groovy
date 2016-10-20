@@ -266,6 +266,13 @@ class EnhancedPriorityBlockingExecutor extends ThreadPoolExecutor {
 		return true
 	}
 
+	void setLatestPriority(Long queueId, Priority priority) {
+		ReportsQueue.withNewTransaction {
+			ReportsQueue queue3=ReportsQueue.get(queueId)
+			queue3.priority=priority
+			queue3.save(flush:true)
+		}
+	}
 
 	/**
 	 * override afterExecute actual method

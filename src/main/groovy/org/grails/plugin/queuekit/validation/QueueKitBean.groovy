@@ -14,7 +14,7 @@ class QueueKitBean implements Validateable {
 	String searchBy
 	String searchFor
 	Long userSearchId
-
+	boolean hideUsers=true
 	String status
 
 	Integer max=Math.min(10, 50)
@@ -102,6 +102,7 @@ class QueueKitBean implements Validateable {
 			offset:offset,
 			position:position,
 			order:order,
+			hideUsers:hideUsers,
 			jobControl:jobControl,
 			max:max
 		]
