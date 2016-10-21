@@ -9,6 +9,8 @@ import org.springframework.web.servlet.support.RequestContextUtils
 
 class ReportDemoController implements GrailsApplicationAware {
 
+	static defaultAction='index8'
+
 	def config
 	GrailsApplication grailsApplication
 

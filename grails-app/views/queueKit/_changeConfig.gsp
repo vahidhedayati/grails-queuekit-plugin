@@ -97,28 +97,27 @@
 </g:if>
 
 <script>
-$("#changeConfigForm").submit(function( event ) {
-	var data = $("#changeConfigForm").serialize();
-	 $.ajax({
-         type: 'post',
-         url: '${createLink(controller:'queueKit',action:'modifyConfig')}',
-         data: data,
-         success: function (response) {
-        	 closeModal();
-        	 $('#results').html(data);
-         },
-         error: function(xhr,status,error){
-             $('#error').html(status);             
-         }    
-     });
-});
-$(function() {
-	hideField('priority');
-	hideField('changeValue');
-	hideField('floodControl');
-	hideField('defaultComparator');
-})
-function configureFields(queueType) {
+	$("#changeConfigForm").submit(function( event ) {
+		var data = $("#changeConfigForm").serialize();
+		 $.ajax({
+	         type: 'post',
+	         url: '${createLink(controller:'queueKit',action:'modifyConfig')}',
+	         data: data,
+	         success: function (response) {
+	        	 closeModal();
+	        	 $('#results').html(data);
+	         },
+	         error: function(xhr,status,error){
+	             $('#error').html(status);             
+	         }    
+	     });
+	});
+	$(function() {
+		hideField('priority');
+		hideField('changeValue');
+		hideField('floodControl');
+		hideField('defaultComparator');
+	})
 	var changeType="${instance.changeType}";
 	var isPool = changeType=='${QueuekitLists.POOL}';
 	var isQueue = changeType=='${QueuekitLists.MAXQUEUE}';
@@ -128,83 +127,89 @@ function configureFields(queueType) {
 	var isQueueCheck = changeType=='${QueuekitLists.CHECKQUEUE}';
 	var isFlood = changeType=='${QueuekitLists.FLOODCONTROL}';
 	var isDefaultComparator = changeType=='${QueuekitLists.DEFAULTCOMPARATOR}';
-	if (isConfig||isLimit||isPool||isQueue) {
-		if ((queueType=='${ReportsQueue.LINKEDBLOCKING}'||queueType=='${ReportsQueue.ARRAYBLOCKING}') && (isConfig||isLimit)) {			 
-			hideButtons();
-			hideField('priority');
+	function configureFields(queueType) {
+		if (isConfig||isLimit||isPool||isQueue) {
+			if ((queueType=='${ReportsQueue.LINKEDBLOCKING}'||queueType=='${ReportsQueue.ARRAYBLOCKING}') && (isConfig||isLimit)) {			 
+				hideButtons();
+				hideField('priority');
+			} else {
+				showButtons(changeType,queueType,isPreserve);
+			}
+		} else if (isFlood) {
+			showType(changeType,queueType,'floodControl');
+		} else if (isDefaultComparator) {
+			showType(changeType,queueType,'defaultComparator');	
 		} else {
-			showButtons(changeType,queueType,isPreserve);
+			if (isConfig) {
+				showButtons(changeType,queueType,isPreserve);
+				hideField('priority');
+			}
 		}
-	} else if (isFlood) {
-		showType(changeType,queueType,'floodControl');
-	} else if (isDefaultComparator) {
-		showType(changeType,queueType,'defaultComparator');	
-	} else {
-		if (isConfig) {
-			showButtons(changeType,queueType,isPreserve);
+	}
+	function hideButtons() {
+		$('#closeForm').show();
+		$('#buttons').hide();	
+		hideField('priority');
+		hideField('changeValue');
+		hideField('floodControl');
+		hideField('defaultComparator');
+	}
+	function hideField(called) {
+		$('#'+called+'Group').hide();
+		$('#'+called).attr('prop','disabled',true).attr('required',false);
+	}
+	function showField(called) {
+		$('#'+called+'Group').show();
+		$('#'+called).attr('prop','disabled',false).attr('required',true);
+		if (isQueue) {
+			$('#'+called).attr('pattern', '^(?!0*\$)^[0-9]{0,4}\$').attr('maxlength', '4').attr('size','4');
+		} else if (isPool) {			
+			$('#'+called).attr('pattern', '^(?!0*\$)^[0-9]{0,2}\$').attr('maxlength', '2').attr('size','2');
+		} else if (isPreserve && called=='changeValue'||isLimit) {			
+			$('#'+called).attr('pattern', '^[0-9]{0,2}\$').attr('maxlength', '2').attr('size','2');
+		}		
+	}
+	function showType(changeType,queueType,field) {
+		$('#closeForm').hide();
+		$('#buttons').show();
+		hideField('changeValue');
+		hideField('priority');
+		showField(field);
+		postButton(changeType,queueType);
+	}
+	function showButtons(changeType,queueType,isPreserve) {
+		$('#closeForm').hide();
+		$('#buttons').show();
+		showField('changeValue');
+		if (isPreserve) {
+			showField('priority');		
+		} else {
 			hideField('priority');
 		}
+		postButton(changeType,queueType);
 	}
-}
-function hideButtons() {
-	$('#closeForm').show();
-	$('#buttons').hide();	
-	hideField('priority');
-	hideField('changeValue');
-	hideField('floodControl');
-	hideField('defaultComparator');
-}
-function hideField(called) {
-	$('#'+called+'Group').hide();
-	$('#'+called).attr('prop','disabled',true).attr('required',false);
-}
-function showField(called) {
-	$('#'+called+'Group').show();
-	$('#'+called).attr('prop','disabled',false).attr('required',true);
-}
-
-function showType(changeType,queueType,field) {
-	$('#closeForm').hide();
-	$('#buttons').show();
-	hideField('changeValue');
-	hideField('priority');
-	showField(field);
-	postButton(changeType,queueType);
-}
-
-function showButtons(changeType,queueType,isPreserve) {
-	$('#closeForm').hide();
-	$('#buttons').show();
-	showField('changeValue');
-	if (isPreserve) {
-		showField('priority');		
-	} else {
-		hideField('priority');
+	function postButton(changeType,queueType) {
+		$.ajax({
+	        type: 'post',
+	        url: '${createLink(controller:'queueKit',action:'loadConfig')}',
+	        data: {changeType:changeType,queueType:queueType},
+	        success: function (data) {
+	            var jsonValue = JSON.parse(data.value);
+	            if (jsonValue) {
+	                $('#changeValue').val(jsonValue);
+	            }
+	            if (data.priority) {
+	                $('#priority option[value="'+data.priority.name+'"]').prop('selected', true);
+	            }
+	            var jsonFloodControl = JSON.parse(data.floodControl);
+	            if (jsonFloodControl) {
+	            	$('#floodControl option[value="'+jsonFloodControl+'"]').prop('selected', true);
+	            }
+	            var jsonDefaultComparator = JSON.parse(data.defaultComparator);
+	            if (jsonDefaultComparator) {
+	            	$('#defaultComparator option[value="'+jsonDefaultComparator+'"]').prop('selected', true);
+	            }           
+	        }
+	    });
 	}
-	postButton(changeType,queueType);
-}
-function postButton(changeType,queueType) {
-	$.ajax({
-        type: 'post',
-        url: '${createLink(controller:'queueKit',action:'loadConfig')}',
-        data: {changeType:changeType,queueType:queueType},
-        success: function (data) {
-            var jsonValue = JSON.parse(data.value);
-            if (jsonValue) {
-                $('#changeValue').val(jsonValue);
-            }
-            if (data.priority) {
-                $('#priority option[value="'+data.priority.name+'"]').prop('selected', true);
-            }
-            var jsonFloodControl = JSON.parse(data.floodControl);
-            if (jsonFloodControl) {
-            	$('#floodControl option[value="'+jsonFloodControl+'"]').prop('selected', true);
-            }
-            var jsonDefaultComparator = JSON.parse(data.defaultComparator);
-            if (jsonDefaultComparator) {
-            	$('#defaultComparator option[value="'+jsonDefaultComparator+'"]').prop('selected', true);
-            }           
-        }
-    });
-}
 </script>

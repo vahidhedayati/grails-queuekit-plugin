@@ -425,27 +425,45 @@ class QueueReportService implements GrailsApplicationAware {
 		def where=''
 		def whereParams=[:]
 		def sorts=['reportName', 'created', 'startDate', 'finishDate' ,'user', 'status', 'priority','queueType','duration','initiation','userId']
-		def sorts2=['rq.reportName', 'rq.created', 'rq.start','rq.finished','rq.userId','rq.status', 'rq.priority','rq.class','rq.finished-rq.start','rq.created-rq.start','rq.userId']
-		def sortChoice=sorts.findIndexOf{it==bean.sort}
+		def sorts2=['rq.reportName', 'rq.created', 'rq.start','rq.finished','rq.userId','rq.status', 'rq.priority','rq.class',
+					'internalDuration','internalInitiation','rq.userId']
 
-		// FROM_UNIXTIME(UNIX_TIMESTAMP(coalesce(rq.finished,rq.start)) -  UNIX_TIMESTAMP(rq.start))
+		def sortChoice=sorts.findIndexOf{it==bean.sort}
+		boolean showUserField
+
+		/*
+		 *  Mysql support for this made date comparison relatively simply -
+		 *  FROM_UNIXTIME(UNIX_TIMESTAMP(coalesce(rq.finished,rq.start)) -  UNIX_TIMESTAMP(rq.start))
+		 *
+		 *  Due to issues with HQL a more complex convert introduced as internalDuration and internalInitiation
+		 *  which are used in above sorting mechanism
+		 *
+		 *  In short customised date comparison between two dates in HQL ordering by difference between them
+		 */
 
 		query="""select new map(rq.id as id, rq.retries as retries, rq.paramsMap as paramsMap,
-		coalesce(rq.displayName,rq.reportName) as reportName, 
+		coalesce(rq.displayName,rq.reportName) as reportName,
 		rq.userId as userId,
 		rq.reportName as realReport,
-			(case 
+			(case
 				when rq.class=ReportsQueue then '${ReportsQueue.ENHANCEDPRIORITYBLOCKING}'
 				when rq.class=EnhancedPriorityBlockingReportsQueue then '${ReportsQueue.ENHANCEDPRIORITYBLOCKING}'
 				when rq.class=PriorityBlockingReportsQueue then '${ReportsQueue.PRIORITYBLOCKING}'
 				when rq.class=LinkedBlockingReportsQueue then '${ReportsQueue.LINKEDBLOCKING}'
 				when rq.class=ArrayBlockingReportsQueue then '${ReportsQueue.ARRAYBLOCKING}'
 			end) as queueType,
-			(case 
+			(case
 				when rq.class=PriorityBlockingReportsQueue then rq.priority
-				when rq.class=EnhancedPriorityBlockingReportsQueue then rq.priority					
+				when rq.class=EnhancedPriorityBlockingReportsQueue then rq.priority
 			end) as priority,
-		rq.fileName as fileName, rq.start as startDate, rq.created as created, 
+			CONVERT(concat(hour(rq.finished)*60*60+minute(rq.finished)*60+second(rq.finished)) ,INTEGER) -
+				CONVERT(concat(hour(rq.start)*60*60+minute(rq.start)*60+second(rq.start)) ,INTEGER)
+			 as internalDuration,
+			CONVERT(concat(hour(rq.start)*60*60+minute(rq.start)*60+second(rq.start)) ,INTEGER) -
+				CONVERT(concat(hour(rq.created)*60*60+minute(rq.created)*60+second(rq.created)) ,INTEGER)
+			as internalInitiation,
+			concat(hour(rq.finished)*60*60+minute(rq.finished)*60+second(rq.finished)*60) as aa,
+		rq.fileName as fileName, rq.start as startDate, rq.created as created,
 		rq.finished as finishDate, rq.status as status
 	)
 	from ReportsQueue rq  """
@@ -454,7 +472,9 @@ class QueueReportService implements GrailsApplicationAware {
 			where=addClause(where,'rq.userId=:userId')
 			whereParams.userId=bean.userId
 		}
-
+		if (!bean.hideUsers && superUser) {
+			showUserField=true
+		}
 		def statuses=[]
 		String add=''
 		if (bean.status) {
@@ -480,8 +500,10 @@ class QueueReportService implements GrailsApplicationAware {
 				if (userId) {
 					where=addClause(where,'rq.userId=:userId')
 					whereParams.userId=userId
+					showUserField=true
 				}
 			}
+
 		}
 
 		query+=where
@@ -491,7 +513,6 @@ class QueueReportService implements GrailsApplicationAware {
 		} else {
 			query+=" order by rq.created $bean.order"
 		}
-
 		def results=ReportsQueue.executeQuery(query,whereParams,metaParams)
 		int total=results.size()
 		if (total>=metaParams.max) {
@@ -507,13 +528,15 @@ class QueueReportService implements GrailsApplicationAware {
 		def threshHold = durationThreshHold?.collect{[hours: it.hours?:0,minutes:it.minutes?:0,seconds:it.seconds?:0,color:it.color?:'']}
 
 		results=results?.each { instance ->
-			instance.duration=getDifference(instance?.startDate,instance?.finishDate)
-			if (instance.duration && threshHold) {
-				instance.color=returnColor(threshHold,instance.duration)
+			TimeDuration duration=getDifference(instance?.startDate,instance?.finishDate)
+			instance.duration=formatDuration(duration)
+			if (duration && threshHold) {
+				instance.color=returnColor(threshHold,duration)
 			}
-			instance.initiation=getDifference(instance?.created,instance?.startDate)
-			if (instance.initiation && threshHold) {
-				instance.initiationColor=returnColor(threshHold,instance.initiation)
+			TimeDuration initiation=getDifference(instance?.created,instance?.startDate)
+			instance.initiation=formatDuration(initiation)
+			if (initiation && threshHold) {
+				instance.initiationColor=returnColor(threshHold,initiation)
 			}
 			if (instance.queueType==ReportsQueue.PRIORITYBLOCKING||instance.queueType==ReportsQueue.ENHANCEDPRIORITYBLOCKING) {
 				instance.priority=instance.priority?:QueuekitLists.sortPriority(instance.realReport)
@@ -531,13 +554,25 @@ class QueueReportService implements GrailsApplicationAware {
 		instanceList << [reportJobs:queueTypes]
 
 		return [instanceList:instanceList, instanceTotal:total, superUser:bean.superUser, statuses:bean.statuses,
-				searchList  :bean.searchList, deleteList:QueuekitLists.deleteList, adminButtons:bean.adminButtons]
+				searchList  :bean.searchList, deleteList:QueuekitLists.deleteList, adminButtons:bean.adminButtons,
+				hideQueueType:config.hideQueueType,hideQueuePriority:config.hideQueuePriority,
+				showUserField:showUserField]
 	}
 
+	private String formatDuration(TimeDuration input) {
+		return input?.toString()?.replace('.000','')
+	}
 	private TimeDuration getDifference(Date startDate,Date endDate) {
 		if (startDate && endDate) {
-			return TimeCategory.minus(endDate, startDate)
+			//return TimeCategory.minus(endDate, startDate)
+			TimeDuration customPeriod = use(TimeCategory ) {
+				customDuration( endDate - startDate )
+			}
+			return customPeriod
 		}
+	}
+	TimeDuration customDuration( TimeDuration tc ) {
+		new TimeDuration(  tc.days , tc.hours, tc.minutes, tc.seconds, ((tc.seconds > 0||tc.minutes > 0||tc.hours > 0) ? 0 : tc.millis))
 	}
 
 	private String returnColor(List threshHold,TimeDuration duration) {

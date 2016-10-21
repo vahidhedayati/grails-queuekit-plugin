@@ -42,9 +42,15 @@
 				<g:sortableColumn property="initiation" titleKey="queuekit.initiation.label" params="${search}" />
 				<g:sortableColumn property="finishDate" titleKey="queuekit.finishDate.label" params="${search}" />
 				<g:sortableColumn property="duration" titleKey="queuekit.duration.label" params="${search}" />
+				<g:if test="${showUserField}">
 				<g:sortableColumn property="userId" titleKey="queuekit.username.label" params="${search}" />
+				</g:if>
+				<g:unless test="${hideQueueType}">
 				<g:sortableColumn property="queueType" titleKey="queuekit.queueType.label" params="${search}" />
+				</g:unless>
+				<g:unless test="${hideQueuePriority}">
 				<g:sortableColumn property="priority" titleKey="queuekit.reportPriority.label" params="${search}" />
+				</g:unless>
 				<g:sortableColumn property="status" titleKey="queuekit.status.label" params="${search}" />
 				<th>&nbsp;</th>
 			</tr>
@@ -59,14 +65,20 @@
 			<g:each in="${instanceList.results}" status="i" var="reportInstance">
 				<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					<td>${reportInstance.reportName}</td>
-					<td><g:formatDate format="${dateFormat}" date="${reportInstance.created}"/></td>
-					<td><g:formatDate format="${dateFormat}" date="${reportInstance.startDate}"/></td>
-					<td style="background: ${reportInstance.initiationColor?:'transparent'}">${reportInstance.initiation?:''}</td>
-					<td><g:formatDate format="${dateFormat}" date="${reportInstance.finishDate}"/></td>
-					<td style="background: ${reportInstance.color?:'transparent'}">${reportInstance.duration?:''}</td>
+					<td class="small"><g:formatDate format="${dateFormat}" date="${reportInstance.created}"/></td>
+					<td class="small"><g:formatDate format="${dateFormat}" date="${reportInstance.startDate}"/></td>
+					<td class="small" style="background: ${reportInstance.initiationColor?:'transparent'}">${reportInstance.initiation?:''}</td>
+					<td class="small"><g:formatDate format="${dateFormat}" date="${reportInstance.finishDate}"/></td>
+					<td class="small" style="background: ${reportInstance.color?:'transparent'}">${reportInstance.duration?:''}</td>
+					<g:if test="${showUserField}">
 					<td>${reportInstance.username?:reportInstance.userId}</td>
-					<td><g:message code="queuekit.queueType.${reportInstance.queueType}"/></td>
+					</g:if>
+					<g:unless test="${hideQueueType}">
+					<td class="small">${g.message(code:'queuekit.queueType.'+reportInstance.queueType)}</td>
+					</g:unless>
+					<g:unless test="${hideQueuePriority}">
 					<td>${reportInstance?.priority?:''}</td>
+					</g:unless>
 					<td><g:message code="queuekit.reportType.${reportInstance.status}"/></td>
 					<td class="dropdown queuekit">
 					<g:if test="${reportInstance.status== ReportsQueue.COMPLETED}">
