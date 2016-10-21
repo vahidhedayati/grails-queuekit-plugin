@@ -7,6 +7,8 @@ import org.springframework.web.servlet.support.RequestContextUtils
 
 class ReportDemoController {
 
+	static defaultAction='index8'
+	
 	def queueReportService
 	def queuekitUserService
 	

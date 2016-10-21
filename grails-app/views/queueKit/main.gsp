@@ -91,6 +91,10 @@
 			color:#fff;
 			padding-top:5px;
 		}
+		.jobButton {
+			padding-top:0px;
+			margin-left:-8px;
+		}
 		.submitButton:hover {
 			background: #24a8f6;
 			padding-top:2px;
@@ -140,6 +144,8 @@
 			margin: 0 0 5px 0px;
 			background-color: #168ccc;
 		}
+		
+
 </style>
 </head>
 <body>

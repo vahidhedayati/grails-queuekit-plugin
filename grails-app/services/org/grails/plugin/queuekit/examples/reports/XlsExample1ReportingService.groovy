@@ -79,8 +79,8 @@ class XlsExample1ReportingService extends QueuekitBaseReportsService {
 					}
 				}
 			}
+			log.debug "priority is now ${priority} was previously ${priority} difference of date : ${difference}"
 		}
-		log.debug "priority is now ${priority} was previously ${priority} difference of date : ${difference}"
 		return priority
 	}
 

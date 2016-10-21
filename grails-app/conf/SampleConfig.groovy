@@ -302,4 +302,14 @@ queuekit {
 	 * then turn it off through this config set it to true. By default it is false
 	 */
 	disableExamples=false
+	
+	/*
+	 * if you no longer wish to display queue type on listing screen set this to true
+	 */
+	hideQueueType=false
+	
+	/*
+	 * If you no longer wish to show report priority on report screen switch this to true 
+	 */
+	hideQueuePriority=false
 }

@@ -22,14 +22,14 @@ queuekit
 
 ### Grails 3: 
 ```groovy
-compile "org.grails.plugins:queuekit:1.7"
+compile "org.grails.plugins:queuekit:1.8"
 ```
  
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/) | [demo](https://github.com/vahidhedayati/test-queuekit3/) 
 
 ### Grails 2: 
 ```groovy
-compile ":queuekit:1.2"
+compile ":queuekit:1.3"
 ```
 
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/grails2) | [demo](https://github.com/vahidhedayati/test-queuekit)
@@ -351,32 +351,70 @@ class XlsExampleReportingService extends QueuekitBaseReportsService {
 	
 	
 	/**
-	 * This is an alternative to default Configuration value or if not LOW priority and
-     * is how you must interact with what parameters you expect from your actual user form
-	 * and decide at this late stage - now that you are aware what they have posted
-	 * if the report should have a higher/lower priority
-	 */
-	Priority getQueuePriority(ReportsQueue queue, Map params) {
-		Priority priority = queue.priority ?: queue.defaultPriority
-		if (params.fromDate && params.toDate) {
-			Date toDate = parseDate(params.toDate)
-			Date fromDate = parseDate(params.fromDate)
-			int difference = toDate && fromDate ? (toDate - fromDate) : null
-			if (difference||difference==0) {
-				if (difference <= 1) {
-					// 1 day everything becomes HIGH priority
-					priority = Priority.HIGH
-				} else if  (difference >= 1 && difference <= 8) {
-					if (priority == Priority.HIGHEST) {
-						priority = Priority.HIGH
-					} else if (priority >= Priority.MEDIUM) {
-						priority = priority.value.previous()
-					}
-				}
-			}
-		}
-		return priority
-	}
+    	 * This overrides the default priority of the report set by
+    	 * QueuekitBaseReportsService
+    	 *
+    	 * By default it is either as per configuration or if not by default
+    	 * LOW priority.
+    	 *
+    	 * At this point you can parse through your params and decide if in this example
+    	 * that the given range fromDate/toDate provided is within a day make report
+    	 * HIGHEST
+    	 * if within a week HIGH and so on
+    	 *
+    	 * This priority check takes place if you are using
+    	 * standard standardRunnable = false if your report default type is
+    	 * EnhancedBlocking
+    	 * if disableUserServicePriorityCheck=false and standardRunnable = true
+    	 * then it should use the priority method very similar to this in
+    	 *
+    	 * queuekitUserService. This is the service you are supposed to extend
+    	 * and declare as a bean back as queuekitUserService.
+    	 *
+    	 * Then you can control priority through this service call and a more
+    	 * centralised control can be configured/setup.
+    	 *
+    	 */
+    	Priority getQueuePriority(ReportsQueue queue, Map params) {
+    		Priority priority = queue.priority ?: queue.defaultPriority
+    		if (params.fromDate && params.toDate) {
+    			Date toDate = parseDate(params.toDate)
+    			Date fromDate = parseDate(params.fromDate)
+    			int difference = toDate && fromDate ? (toDate - fromDate) : null
+    			if (difference||difference==0) {
+    				if (difference <= 1) {
+    					// 1 day everything becomes HIGH priority
+    					priority = Priority.HIGH
+    				} else if  (difference >= 1 && difference <= 8) {
+    					if (priority == Priority.HIGHEST) {
+    						priority = Priority.HIGH
+    					} else if (priority >= Priority.MEDIUM) {
+    						priority = priority.value.previous()
+    					}
+    				} else if  (difference >= 8 && difference <= 31) {
+    					if (priority <= Priority.HIGH) {
+    						priority = Priority.MEDIUM
+    					} else if (priority >= Priority.LOW) {
+    						priority = priority.next()
+    					}
+    				} else if  (difference >= 31 && difference <= 186) {
+    					if (priority >= Priority.MEDIUM && priority <= Priority.HIGHEST) {
+    						priority = priority.next()
+    					} else if (priority >= Priority.LOW) {
+    						priority = priority.previous()
+    					}
+    				} else if  (difference >= 186) {
+    					if (priority <= Priority.LOWEST) {
+    						priority = priority.previous()
+    					} else if (priority >= Priority.LOW) {
+    						priority = priority.next()
+    					}
+    				}
+    			}
+    			log.debug "priority is now ${priority} was previously ${priority} difference of date : ${difference}"
+    		}
+    		return priority
+    	}
 	
 	/*
 	 * 

@@ -13,8 +13,15 @@
 							  noSelection="${['':"${g.message(code:'queuekit.chooseAdminAction.label')}"]}"
 							  valueMessagePrefix="queuekit.adminButton"/></li>
 			</g:if>
-			<g:if test="${instanceList.reportJobs}">
-				<li><a class="jobButton" id="jobCtrl"><g:message code="queuekit.jobControl.label" args="${[g.message(code:'queuekit.show.label')]}"/></a></li>
+			<g:if test="${superUser||instanceList.reportJobs}">
+			<li>
+				<g:if test="${superUser}">
+					<g:checkBox name="hideUsers" value="${search.hideUsers}"/> <g:message code="queuekit.hideOtherUsers.label"/>
+				</g:if>
+				<g:if test="${instanceList.reportJobs}">
+					<a class="jobButton" id="jobCtrl"><g:message code="queuekit.jobControl.label" args="${[g.message(code:'queuekit.show.label')]}"/></a>
+				</g:if>
+			</li>
 			</g:if>
 		</ul>
 	</div>	
@@ -33,11 +40,6 @@
 		<g:select name="status" class="form-control small" from="${statuses}" noSelection="${['':"${g.message(code:'queuekit.chooseStatus.label')}"]}"
 		value="${search?.status}" onChange="reloadPage();" valueMessagePrefix="queuekit.reportType" />
 		</li>
-		<g:if test="${superUser}">
-		<li>
-			<g:checkBox name="hideUsers" value="${search.hideUsers}"/> <g:message code="queuekit.hideOtherUsers.label"/>
-		</li>
-		</g:if>		
 		<li>
 			<g:hiddenField name="jobControl" value="${search?.jobControl}"/>
 			<button type="submit" class="submitButton" name="submit" >${message(code: 'queuekit.search.label')}</button>	
