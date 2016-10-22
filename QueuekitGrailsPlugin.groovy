@@ -4,16 +4,15 @@ import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
 
 class QueuekitGrailsPlugin {
-	def version = "1.3"
+	def version = "1.4"
 	def grailsVersion = "2.4 > *"
 	def title = "queuekit plugin"
-	def description = """Queuekit plugin incorporates TaskExecutor ArrayBlocking / LinkBlocking and PriorityBlocking. 
-	It also enhances on PriorityBlocking with a new custom method EnhancedPriorityBlocking. Define queue limit
-	which in turn limits concurrent usage of all users. Typical request on demand report system will change to background queued 
-	reports system. Choose the best blocking method for your queues. Both Priority and EnhancedPriority allow
-	queue items to have a default or on the fly priority. EnhancedPriority has additional code that runs requested task within a sub thread. 
-	When master task or live running task is cancelled. The underlying thread is cancelled. 
-	This gives you the feature to cancel live background threaded tasks."""
+	def description = """Queuekit plugin provides you with various ways of calling on TaskExecutor and specifically it's
+ underlying queuing mechanism to control the creation of reports on your grails application. Queuekit can help whether
+ you are using the existing grails export plugin or you manually produce csv,tsv or maybe even rely on apache-poi or it's
+ likes to produce xls files as per user request. With this plugin you can change the process of files produces as requested
+ to files produced when there is an available runable space for it to be executed. In effect saving your application from
+ slowing down if there are surges for reports by your userbase."""
 	def documentation = "https://github.com/vahidhedayati/grails-queuekit-plugin"
 	def license = "APACHE"
 	def developers = [name: 'Vahid Hedayati', email: 'badvad@gmail.com']

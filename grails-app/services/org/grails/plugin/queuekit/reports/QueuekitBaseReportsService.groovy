@@ -208,7 +208,8 @@ abstract class QueuekitBaseReportsService  {
 				 */				
 				if (queue.isEnhancedPriority()) {
 
-					def manualDownloadEnabled = config.manualDownloadEnabled == true
+					def manualDownloadEnabled = (config.manualDownloadEnabled &&  config.manualDownloadEnabled == true)
+
 					if (manualDownloadEnabled && isManual(queue.id)) {
 						runReport(queue,paramsMap)
 					} else {
