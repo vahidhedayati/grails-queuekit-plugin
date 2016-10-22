@@ -44,7 +44,7 @@ class QueuekitLists {
 		return priority
 	}
 	static Priority getConfigPriority(String reportName) {
-		return (getConfig('reportPriorities') as Map).find{k,v-> k==reportName}.value  as Priority 		
+		return ((getConfig('reportPriorities') as Map).find{k,v-> k==reportName}?.value  as Priority?: Priority.LOW)
 	}
 	static def getConfig(String configProperty) {
 		 Holders.grailsApplication.config.queuekit[configProperty] ?: ''

@@ -883,8 +883,8 @@ class QueueReportService implements GrailsApplicationAware {
 		 * lets capture it and slow down the pace a little
 		 *  
 		 */
-		//new Thread({
-		//	sleep(500)
+		new Thread({
+			sleep(500)
 			switch (queue?.queueLabel) {
 				case ReportsQueue.LINKEDBLOCKING:
 					notify( "method.linkedBlocking",queue.id)
@@ -899,7 +899,7 @@ class QueueReportService implements GrailsApplicationAware {
 					notify( "method.enhancedPriorityBlocking",queue.id)
 					break
 			}
-		//} as Runnable ).start()
+		} as Runnable ).start()
 		return queue
 	}
 

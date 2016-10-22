@@ -35,8 +35,9 @@ class PriorityBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 			PriorityBlockingReportsQueue queue = PriorityBlockingReportsQueue.read(eventId)
 			if (queue && (queue.status == ReportsQueue.QUEUED || queue.status == ReportsQueue.ERROR)) {
 
-				def useEmergencyExecutor = config.useEmergencyExecutor == true
-				def manualDownloadEnabled = config.manualDownloadEnabled == true
+				def useEmergencyExecutor = (config.useEmergencyExecutor && config.useEmergencyExecutor == true)
+				def manualDownloadEnabled = (config.manualDownloadEnabled &&  config.manualDownloadEnabled == true)
+
 
 				if ((priorityBlockingExecutor.isShutdown() || priorityBlockingExecutor.isTerminated()) &&
 						(!useEmergencyExecutor || (useEmergencyExecutor &&

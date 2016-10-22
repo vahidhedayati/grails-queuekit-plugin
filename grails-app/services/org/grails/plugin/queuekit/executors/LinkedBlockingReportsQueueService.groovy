@@ -33,8 +33,9 @@ class LinkedBlockingReportsQueueService extends QueuekitExecutorBaseService {
 			LinkedBlockingReportsQueue queue = LinkedBlockingReportsQueue.read(eventId)
 			if (queue && (queue.status == ReportsQueue.QUEUED || queue.status == ReportsQueue.ERROR)) {
 
-				def useEmergencyExecutor = config.useEmergencyExecutor == true
-				def manualDownloadEnabled = config.manualDownloadEnabled == true
+				def useEmergencyExecutor = (config.useEmergencyExecutor && config.useEmergencyExecutor == true)
+				def manualDownloadEnabled = (config.manualDownloadEnabled &&  config.manualDownloadEnabled == true)
+
 				if ((linkedBlockingExecutor.isShutdown() || linkedBlockingExecutor.isTerminated()) &&
 						(!useEmergencyExecutor || (useEmergencyExecutor &&
 								(linkedBlockingExecutor.alternateExecutor.isShutdown() || linkedBlockingExecutor.alternateExecutor.isTerminated()))

@@ -139,7 +139,7 @@ class ReportDemoController implements GrailsApplicationAware {
 		 * the end user will be not aware there is issues and will still collect file as they would from the queueKit controller listing
 		 *
 		 */
-		if (config.manualDownloadEnabled==true) {
+		if (config.manualDownloadEnabled && config.manualDownloadEnabled==true) {
 			sleep(1000)
 			ReportsQueue.withNewSession {
 				ReportsQueue queue1 = ReportsQueue.get(queue.id as Long)
