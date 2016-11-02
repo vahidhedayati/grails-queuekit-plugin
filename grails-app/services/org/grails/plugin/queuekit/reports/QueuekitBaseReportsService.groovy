@@ -121,7 +121,7 @@ abstract class QueuekitBaseReportsService  {
 	 * @param locale
 	 * @return
 	 */
-	abstract def actionInternal(out,bean, queryResults,Locale locale)
+	abstract def actionInternal(ReportsQueue queue,out,bean, queryResults,Locale locale)
 
 	/**
 	 * Override method called by your extended Service runReport method
@@ -153,7 +153,7 @@ abstract class QueuekitBaseReportsService  {
 			}
 
 			/* abstract method above */
-			actionInternal(out,bean, queryResults,queue.locale)
+			actionInternal(queue,out,bean, queryResults,queue.locale)
 
 			/*
 			 * global method at the very bottom of this class

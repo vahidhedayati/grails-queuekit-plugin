@@ -1,5 +1,7 @@
 package org.grails.plugin.queuekit.examples.reports
 
+import java.util.Locale;
+
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.priority.Priority
 import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
@@ -14,7 +16,7 @@ class ParamsExampleReportingService extends QueuekitBaseReportsService {
 		runReport(queue,queryResults,params)
 	}
 
-	def actionInternal(out,bean, queryResults,Locale locale) {
+	def actionInternal(ReportsQueue queue, out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}
 

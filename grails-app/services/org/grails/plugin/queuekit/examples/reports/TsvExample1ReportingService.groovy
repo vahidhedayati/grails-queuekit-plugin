@@ -1,5 +1,7 @@
 package org.grails.plugin.queuekit.examples.reports
 
+import java.util.Locale;
+
 import org.codehaus.groovy.grails.web.binding.DataBindingUtils
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.examples.Report1Bean
@@ -39,7 +41,7 @@ class TsvExample1ReportingService extends QueuekitBaseReportsService {
 		runReport(queue,queryResults,bean)
 	}
 
-	def actionInternal(out,bean, queryResults,Locale locale) {
+	def actionInternal(ReportsQueue queue, out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}
 
