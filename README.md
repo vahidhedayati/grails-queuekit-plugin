@@ -32,7 +32,7 @@ convert those reports to background queued tasks that you then define limitation
 
 ### Grails 3: 
 ```groovy
-compile "org.grails.plugins:queuekit:1.9"
+compile "org.grails.plugins:queuekit:1.11"
 ```
  
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/) |
@@ -40,7 +40,7 @@ compile "org.grails.plugins:queuekit:1.9"
 
 ### Grails 2: 
 ```groovy
-compile ":queuekit:1.4"
+compile ":queuekit:1.5"
 ```
 
 ##### [source](https://github.com/vahidhedayati/grails-queuekit-plugin/tree/grails2) |

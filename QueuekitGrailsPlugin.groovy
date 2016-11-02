@@ -4,7 +4,7 @@ import org.grails.plugin.queuekit.priority.EnhancedPriorityBlockingExecutor
 import org.grails.plugin.queuekit.priority.PriorityBlockingExecutor
 
 class QueuekitGrailsPlugin {
-	def version = "1.4"
+	def version = "1.5"
 	def grailsVersion = "2.4 > *"
 	def title = "queuekit plugin"
 	def description = """Queuekit plugin provides you with various ways of calling on TaskExecutor and specifically it's

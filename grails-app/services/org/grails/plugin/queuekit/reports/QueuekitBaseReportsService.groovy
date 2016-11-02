@@ -163,7 +163,7 @@ abstract class QueuekitBaseReportsService  {
 			 */
 			actionReport(queue,bean,filename)
 		} else {
-			errorReport(queue,bean)
+			errorReport(queue)
 		}
 	}
 
@@ -420,7 +420,7 @@ abstract class QueuekitBaseReportsService  {
 	 * @param queue
 	 * @param bean
 	 */
-	private void errorReport(ReportsQueue queue,bean) {
+	private void errorReport(ReportsQueue queue) {
 		// Override reportName for special report types that share same service call/functionality
 		ReportsQueue.withNewTransaction {
 			ReportsQueue queue2=ReportsQueue.get(queue.id)
