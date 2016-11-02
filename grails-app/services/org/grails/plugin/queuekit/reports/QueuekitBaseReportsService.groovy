@@ -74,14 +74,15 @@ abstract class QueuekitBaseReportsService implements GrailsApplicationAware {
 	/**
 	 * Abstract method must exist in all classes that extend this class
 	 * At this point runReport method in your service has produced 
-	 * queryResults  
+	 * queryResults
+	 * ReportsQueue queue
 	 * @param out
 	 * @param bean
 	 * @param queryResults
 	 * @param locale
 	 * @return
 	 */
-	abstract def actionInternal(out,bean, queryResults,Locale locale)
+	abstract def actionInternal(ReportsQueue queue, out,bean, queryResults,Locale locale)
 
 	/**
 	 * getQueuePriority is by default the queue's configuration priority
@@ -157,7 +158,7 @@ abstract class QueuekitBaseReportsService implements GrailsApplicationAware {
 			}
 
 			/* abstract method above */
-			actionInternal(out,bean, queryResults,queue.locale)
+			actionInternal(queue,out,bean, queryResults,queue.locale)
 
 			/*
 			 * global method at the very bottom of this class

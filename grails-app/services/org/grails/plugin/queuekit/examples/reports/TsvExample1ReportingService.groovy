@@ -37,7 +37,7 @@ class TsvExample1ReportingService extends QueuekitBaseReportsService {
 		runReport(queue,queryResults,bean)
 	}
 
-	def actionInternal(out,bean, queryResults,Locale locale) {
+	def actionInternal(ReportsQueue queue,out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}
 

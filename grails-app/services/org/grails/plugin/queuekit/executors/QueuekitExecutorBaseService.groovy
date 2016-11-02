@@ -81,8 +81,8 @@ class QueuekitExecutorBaseService implements GrailsApplicationAware {
 		log.debug "waiting reports ${waiting.size()}"
 		waiting?.each{queue ->
 
-			//new Thread({
-			//	sleep(500)
+			new Thread({
+				sleep(500)
 				switch (queue?.queueType) {
 					case ReportsQueue.LINKEDBLOCKING:
 						notify( "method.linkedBlocking",queue.id)
@@ -98,7 +98,7 @@ class QueuekitExecutorBaseService implements GrailsApplicationAware {
 						break
 				}
 
-			//} as Runnable ).start()
+			} as Runnable ).start()
 		}
 	}
 

@@ -123,10 +123,10 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 		waiting?.each{queue ->
 			if (running < threadLimit) {
 				setRequeueDate(queue.id)
-				//new Thread({
-					//sleep(500)
-				notify( "method.arrayBlocking",queue.id)
-				//} as Runnable ).start()
+				new Thread({
+					sleep(500)
+					notify( "method.arrayBlocking",queue.id)
+				} as Runnable ).start()
 				running++
 			}
 
@@ -230,7 +230,10 @@ class ArrayBlockingReportsQueueService extends QueuekitExecutorBaseService  {
 				if (running < threadLimit ) {
 					startedJob=true
 					setRequeueDate(queue.id)
-					notify( "method.arrayBlocking",queue.id)
+					new Thread({
+						sleep(400)
+						notify("method.arrayBlocking", queue.id)
+					})
 					running++
 				}
 			}
