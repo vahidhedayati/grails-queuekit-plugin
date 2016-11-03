@@ -286,11 +286,10 @@ Now with this in place I will need to create a new service called `ExportPluginA
 ```groovy
 package test
 
+
 import grails.util.Holders
 import org.grails.plugin.queuekit.ReportsQueue
 import org.grails.plugin.queuekit.reports.QueuekitBaseReportsService
-import testing.TestAddress
-import testing.TestAttributes
 
 class ExportPluginAdvancedReportingService extends QueuekitBaseReportsService {
 
@@ -308,56 +307,59 @@ class ExportPluginAdvancedReportingService extends QueuekitBaseReportsService {
 		return 'xls'
 	}
 
-	def actionInternal(out,bean, queryResults,Locale locale) {
-		actionReport1Report(out,bean,queryResults)
-	}
+	def actionInternal(ReportsQueue queue,out,bean, queryResults,Locale locale) {
+    		actionReport1Report(queue,out,bean,queryResults)
+    	}
 
-	/**
-	 *
-	 *
-	 * @param out -> Where out is provided by plugin
-	 * @param bean ->Where bean is your actual user params from the front end screen
-	 * @param queryResults -> QueryResults would be what would be produced by your code
-	 * 				In the case of this we are setting it to [something:'aa']
-	 * 				above. This then will continue working and hit this block
-	 * 				which will carry out real export service task at hand.
-     */
-	private void actionReport1Report(out,bean,queryResults) {
-		String format=bean.f ?: 'html'
-		if(format && format != "html"){
-			log.debug "Params received  ${bean.f} ${bean.extension} "
-			def domain= bean.domainClass
 
-			if (domain) {
-				println "got Domain ${domain}"
-				//	def domainClass = Holders.grailsApplication?.domainClasses?.find { it.clazz.simpleName == uc(domain) }?.clazz
-				def domainClass = Holders.grailsApplication.getDomainClass(domain)?.clazz
-				if (domainClass) {
-					println "we have a real domainClass ${domainClass}"
-					domainClass.withTransaction {
-						Map formatters=[:]
-						Map parameters=[:]
-						switch (domain) {
-							case 'TestAddress':
-								println "custom testAddress stuff here"
-								//formatters=[:]
-								//parameters=[:]
-								//bean.something=SomethingElse
-								break
-							case 'TestAttribues':
-								println "custom testAttributes stuff here"
-								//What would you like to do
-								//formatters=[:]
-								//parameters=[:]
-								break
-						}
-						//Export service is being called here
-						exportService.export(format, (OutputStream) out, domainClass.list(bean),formatters,parameters)
-					}
-				}
-			}
-		}
-	}
+    	/**
+    	 *
+    	 *
+    	 * @param out -> Where out is provided by plugin
+    	 * @param bean ->Where bean is your actual user params from the front end screen
+    	 * @param queryResults -> QueryResults would be what would be produced by your code
+    	 * 				In the case of this we are setting it to [something:'aa']
+    	 * 				above. This then will continue working and hit this block
+    	 * 				which will carry out real export service task at hand.
+         */
+
+    	private void actionReport1Report(queue,out,bean,queryResults) {
+    		String format=bean.f ?: 'html'
+    		if(format && format != "html"){
+    			log.debug "Params received  ${bean.f} ${bean.extension} "
+    			def domain= bean.domainClass
+    			try {
+    				if (domain) {
+    					println "got Domain ${domain}"
+    					//	def domainClass = Holders.grailsApplication?.domainClasses?.find { it.clazz.simpleName == uc(domain) }?.clazz
+    					def domainClass = Holders.grailsApplication.getDomainClass(domain)?.clazz
+    					if (domainClass) {
+    						println "we have a real domainClass ${domainClass}"
+    						domainClass.withTransaction {
+    							Map formatters=[:]
+    							Map parameters=[:]
+    							switch (domain) {
+    								case 'testing.TestAddress':
+    									println "custom testAddress stuff here"
+    									//formatters=[:]
+    									//parameters=[:]
+    									//bean.something=SomethingElse
+    									break
+    								case 'testing.TestAttribues':
+    									println "custom testAttributes stuff here"
+    									//What would you like to do
+    									//formatters=[:]
+    									//parameters=[:]
+    									break
+    							}
+    							exportService.export(format, (OutputStream) out, domainClass.list(bean),formatters,parameters)
+    						}
+    					}
+    				}
+    			} catch (Exception e) {
+    				super.errorReport(queue,bean)
+    			}
+    		}
 
 	/*
 	 *
@@ -496,7 +498,7 @@ class ParamsExampleReportingService extends QueuekitBaseReportsService {
      * your own custom method which like shown above iterates through your list
      * and pushes into out
      */
-	def actionInternal(out,bean, queryResults,Locale locale) {
+	def actionInternal(ReportsQueue queue,out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}
 
@@ -675,7 +677,7 @@ class XlsExampleReportingService extends QueuekitBaseReportsService {
 		runReport(queue,queryResults,params)
 	}
 
-	def actionInternal(out,bean, queryResults,Locale locale) {
+	def actionInternal(ReportsQueue queue,out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}
 

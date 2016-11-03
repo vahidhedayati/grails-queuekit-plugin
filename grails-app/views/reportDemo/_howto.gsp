@@ -106,7 +106,7 @@ class ParamsExampleReportingService extends QueuekitBaseReportsService {
      * your own custom method which like shown above iterates through your list
      * and pushes into out
      */
-	def actionInternal(out,bean, queryResults,Locale locale) {
+	def actionInternal(ReportsQueue queue, out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}
 
@@ -290,7 +290,7 @@ class XlsExampleReportingService extends QueuekitBaseReportsService {
 		runReport(queue,queryResults,params)
 	}
 
-	def actionInternal(out,bean, queryResults,Locale locale) {
+	def actionInternal(ReportsQueue queue, out,bean, queryResults,Locale locale) {
 		actionReport1Report(out,bean,queryResults)
 	}
 
