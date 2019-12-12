@@ -1,6 +1,11 @@
 queuekit
 =========
 
+### Side note - similar / related projects
+- [grails-queuekit-plugin (this)](https://github.com/vahidhedayati/grails-queuekit-plugin)
+
+- [grails-queuemail-plugin](https://github.com/vahidhedayati/grails-queuemail-plugin)
+
 #### Queuekit is a plugin for grails which uses TaskExecutor with Spring Events for grails 2 and for grails 3 using
 default `Reactor` events to manage concurrent submitted reports.You can use it for your own custom reporting needs or
 simply combine it with grails export plugin to queue export requests.
